@@ -3,6 +3,8 @@ import streamlit as st
 from datetime import datetime
 import string
 import logging
+import zipfile
+import os
 
 # Function to split and save Excel file
 def split_and_save_excel(input_file, max_rows=9800):
@@ -70,9 +72,14 @@ if uploaded_file is not None:
         with open(file, "rb") as f:
             st.download_button(label="Download", data=f, file_name=file)
 
-    # Download all files
-    if st.button("Download All Files"):
-        with st.spinner("Downloading..."):
-            for file in output_files:
-                with open(file, "rb") as f:
-                    st.download_button(label="Download", data=f, file_name=file)
+    # Download all files as a zip
+    if st.button("Download All Files (Zipped)"):
+        with st.spinner("Zipping files..."):
+            zip_file_name = "output_files.zip"
+            with zipfile.ZipFile(zip_file_name, "w") as zipf:
+                for file in output_files:
+                    zipf.write(file)
+            with open(zip_file_name, "rb") as f:
+                st.download_button(label="Download", data=f, file_name=zip_file_name)
+            # Remove the zip file after download
+            os.remove(zip_file_name)
