@@ -96,8 +96,7 @@ def process_files(input_file):
     final_df.to_csv(pivot_output_path, index=False)
     
     # Display success message with downloadable link for Pivot file
-    pivot_output_link = f"[{pivot_output_path}]({pivot_output_path})"
-    st.success(f"Pivot formatted data has been created and saved to {pivot_output_link}")
+    st.markdown(get_download_link(pivot_output_path, "Download Pivot File"), unsafe_allow_html=True)
     
     # Define the base output file name for PIM file
     pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
@@ -126,10 +125,16 @@ def process_files(input_file):
     pim_df.to_csv(pim_output_path, index=False)
     
     # Display success message with downloadable link for PIM file
-    pim_output_link = f"[{pim_output_path}]({pim_output_path})"
-    st.success(f"PIM formatted data has been created and saved to {pim_output_link}")
+    st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
     
     return True  # Return True to indicate processing is completed
+
+# Function to generate HTML download link
+def get_download_link(file_path, link_text):
+    with open(file_path, "rb") as f:
+        file_bytes = f.read()
+    b64 = base64.b64encode(file_bytes).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="{os.path.basename(file_path)}">{link_text}</a>'
 
 # Streamlit app
 def main():
