@@ -94,7 +94,7 @@ def process_files(input_file):
     
     # Save the Pivot DataFrame to a CSV file
     pivot_output_path = os.path.join(output_folder, pivot_output_file)
-    final_df.to_csv(pivot_output_path, index=False)
+    final_df.to_csv(pivot_output_path, index=False, encoding='utf-8')  # Specify encoding as utf-8
     
     # Display success message with downloadable link for Pivot file
     st.markdown(get_download_link(pivot_output_path, "Download Pivot File"), unsafe_allow_html=True)
@@ -123,7 +123,7 @@ def process_files(input_file):
     
     # Save the PIM DataFrame to a CSV file
     pim_output_path = os.path.join(output_folder, pim_output_file)
-    pim_df.to_csv(pim_output_path, index=False)
+    pim_df.to_csv(pim_output_path, index=False, encoding='utf-8')  # Specify encoding as utf-8
     
     # Display success message with downloadable link for PIM file
     st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
