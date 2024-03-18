@@ -67,8 +67,7 @@ def main():
             # Process each uploaded Excel file
             for uploaded_file in uploaded_files:
                 try:
-                    df = pd.read_excel(uploaded_file)
-                    
+                    df = pd.read_excel(uploaded_file, encoding='utf-8')  # Specify encoding for Chinese characters
                     # Assuming 'COLOR' is the correct column name, adjust it if needed
                     if 'COLOR' in df.columns:
                         df['Check'] = df['COLOR'].apply(lambda x: check_for_color(str(x)))
@@ -102,7 +101,7 @@ def main():
             # Provide a download link for the output file
             st.download_button(
                 label="Download Output File",
-                data=combined_df.to_csv(index=False, encoding='utf-8-sig'),
+                data=open(output_file_path, 'rb').read(),
                 file_name=output_file_name,
                 mime='text/csv'
             )
