@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime
 import os
 import streamlit as st
+import base64  # Add this import statement for base64 encoding
 
 # Define a function to process the input and generate output files
 def process_files(input_file):
