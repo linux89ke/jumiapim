@@ -67,7 +67,7 @@ def main():
             # Process each uploaded Excel file
             for uploaded_file in uploaded_files:
                 try:
-                    df = pd.read_excel(uploaded_file, encoding='utf-8')  # Specify encoding for Chinese characters
+                    df = pd.read_excel(uploaded_file, engine='openpyxl')  # Use openpyxl engine
                     # Assuming 'COLOR' is the correct column name, adjust it if needed
                     if 'COLOR' in df.columns:
                         df['Check'] = df['COLOR'].apply(lambda x: check_for_color(str(x)))
