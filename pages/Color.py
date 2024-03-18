@@ -99,8 +99,13 @@ def main():
 
             st.success(f"Output file '{output_file_name}' created.")
 
-            # Provide a URL to download the output file
-            st.markdown(f"Download the output file: [Output File]({output_file_path})")
+            # Provide a download link for the output file
+            st.download_button(
+                label="Download Output File",
+                data=combined_df.to_csv(index=False, encoding='utf-8-sig'),
+                file_name=output_file_name,
+                mime='text/csv'
+            )
         except Exception as e:
             st.error(f"Error: {e}")
 
