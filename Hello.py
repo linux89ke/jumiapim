@@ -94,7 +94,10 @@ def process_files(input_file):
     # Save the Pivot DataFrame to a CSV file
     pivot_output_path = os.path.join(output_folder, pivot_output_file)
     final_df.to_csv(pivot_output_path, index=False)
-    st.success(f"Pivot formatted data has been created and saved to [{pivot_output_path}]({pivot_output_path})")
+    
+    # Display success message with downloadable link for Pivot file
+    pivot_output_link = f"[{pivot_output_path}]({pivot_output_path})"
+    st.success(f"Pivot formatted data has been created and saved to {pivot_output_link}")
     
     # Define the base output file name for PIM file
     pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
@@ -121,7 +124,11 @@ def process_files(input_file):
     # Save the PIM DataFrame to a CSV file
     pim_output_path = os.path.join(output_folder, pim_output_file)
     pim_df.to_csv(pim_output_path, index=False)
-    st.success(f"PIM formatted data has been created and saved to [{pim_output_path}]({pim_output_path})")
+    
+    # Display success message with downloadable link for PIM file
+    pim_output_link = f"[{pim_output_path}]({pim_output_path})"
+    st.success(f"PIM formatted data has been created and saved to {pim_output_link}")
+    
     return True  # Return True to indicate processing is completed
 
 # Streamlit app
