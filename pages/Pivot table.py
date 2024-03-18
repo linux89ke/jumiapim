@@ -102,7 +102,36 @@ def process_files(input_file):
     # Display the data from the Pivot file
     st.subheader("Data from Pivot File")
     st.write(final_df)
-
+    
+    # Define the base output file name for PIM file
+    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
+    counter = 1
+    while os.path.exists(os.path.join(output_folder, pim_output_file)):
+        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
+        counter += 1
+    
+    # Create the PIM DataFrame
+    pim_df = df[['PRODUCT_SET_SID', 'PARENTSKU']].copy()  # Use the correct column names from the input file
+    pim_df.columns = ['ProductSetSid', 'ParentSKU']  # Rename columns for consistency
+    
+    # Apply mapping for 'reason' to generate 'Status' and 'Reason' columns
+    pim_df['Status'] = df['reason'].apply(lambda x: 'Approved' if pd.isna(x) or x == '' else 'Rejected')
+    pim_df['Reason'] = df['reason'].map(reason_mapping).fillna('Approved')  # Fill blank reasons with 'Approved'
+    pim_df.loc[pim_df['Status'] == 'Approved', ['Reason', 'Comment']] = ''
+    
+    # Apply specific mappings for certain reasons
+    pim_df.loc[pim_df['Reason'] == 'Wrong Brand', 'Comment'] = 'Please use Fashion as brand name'
+    
+    # Sort PIM DataFrame by 'Status'
+    pim_df.sort_values(by='Status', ascending=False, inplace=True)
+    
+    # Save the PIM DataFrame to a CSV file
+    pim_output_path = os.path.join(output_folder, pim_output_file)
+    pim_df.to_csv(pim_output_path, index=False, encoding='utf-8-sig')  # Specify encoding as utf-8-sig to preserve non-English characters
+    
+    # Display success message with downloadable link for PIM file
+    st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
+    
     return True  # Return True to indicate processing is completed
 
 # Function to generate HTML download link
