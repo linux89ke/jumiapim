@@ -23,15 +23,3 @@ To use this app, simply follow these steps:
 ## Get Started
 Ready to dive in? Let's start by selecting an option from the sidebar menu on the left.
 """)
-
-# Sidebar
-st.sidebar.title("Navigation")
-selected_option = st.sidebar.radio("Go to", ("Home", "Page 1", "Page 2"))
-
-# Display different pages based on user selection
-if selected_option == "Home":
-    st.write("This is the Home page.")
-elif selected_option == "Page 1":
-    st.write("This is Page 1.")
-elif selected_option == "Page 2":
-    st.write("This is Page 2.")
