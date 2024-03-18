@@ -122,6 +122,7 @@ def process_files(input_file):
     pim_output_path = os.path.join(output_folder, pim_output_file)
     pim_df.to_csv(pim_output_path, index=False)
     st.success(f"PIM formatted data has been created and saved to [{pim_output_path}]({pim_output_path})")
+    return True  # Return True to indicate processing is completed
 
 # Streamlit app
 def main():
@@ -138,11 +139,8 @@ def main():
         st.write(file_details)
         
         # Process the uploaded file
-        progress_bar = st.progress(0)
-        for percent_complete in range(100):
-            process_files(uploaded_file)
-            progress_bar.progress(percent_complete + 1)
+        if process_files(uploaded_file):
+            st.stop()  # Stop the Streamlit app execution
 
 if __name__ == "__main__":
     main()
-
