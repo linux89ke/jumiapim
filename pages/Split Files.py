@@ -73,7 +73,7 @@ if uploaded_file is not None:
             st.download_button(label="Download", data=f, file_name=file)
 
     # Download all files as a zip
-    if st.button("Download All Files (Zipped)"):
+    if st.button("All Files (Zipped)"):
         with st.spinner("Zipping files..."):
             zip_file_name = "output_files.zip"
             with zipfile.ZipFile(zip_file_name, "w") as zipf:
