@@ -2,7 +2,6 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime
 import string
-import os
 import logging
 
 # Function to split and save Excel file
@@ -36,10 +35,9 @@ def split_and_save_excel(input_file, max_rows=9800):
 
             # Construct the output file name
             output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
-            output_file_path = os.path.join("output_files", output_file_name)
 
             # Save the current sheet
-            smaller_df.to_excel(output_file_path, index=False)
+            smaller_df.to_excel(output_file_name, index=False)
 
             output_files.append(output_file_name)
 
@@ -69,13 +67,12 @@ if uploaded_file is not None:
     st.write("Output Files:")
     for file in output_files:
         st.write(file)
-        with open(os.path.join("output_files", file), "rb") as f:
+        with open(file, "rb") as f:
             st.download_button(label="Download", data=f, file_name=file)
 
     # Download all files
     if st.button("Download All Files"):
         with st.spinner("Downloading..."):
             for file in output_files:
-                with open(os.path.join("output_files", file), "rb") as f:
+                with open(file, "rb") as f:
                     st.download_button(label="Download", data=f, file_name=file)
-
