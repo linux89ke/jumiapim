@@ -89,12 +89,8 @@ def main():
                     
                     # Check for brand existence based on CATEGORY_CODE from category FAS.xlsx
                     if 'ID' in df.columns and 'BRAND' in df.columns:
-                        df['Check_brand'] = df['ID'].apply(lambda id_value: "No")
-                        if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic":
-    return "No"
-else:
-    return "Yes"  # Assuming if the brand is not "Generic", return "Yes"
-
+                        df['Check_brand'] = df['ID'].apply(lambda id_value: "No" if category_fas
+                        df['Check_brand'] = df['ID'].apply(lambda id_value: "No" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic" else "Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found")
                     
                     # Drop the column containing URLs if it exists
                     if 'URL_COLUMN_NAME' in df.columns:
