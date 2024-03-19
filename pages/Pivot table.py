@@ -82,10 +82,9 @@ def process_files(input_file):
     final_df.insert(0, 'Week_Number', pd.to_datetime(final_df['Date_Column']).dt.isocalendar().week)
     final_df.insert(1, 'Formatted_Date', pd.to_datetime(final_df['Date_Column']).dt.strftime('%m/%d/%Y'))
     
-    # Add two columns after 'rej' with 'KE' and dropdown for 'new_col_2'
-    new_col_2_value = st.selectbox("Select a value for 'new_col_2'", options=["Charles", "Ian"])
+    # Add two columns after 'rej' with 'KE' and 'Charles'
     final_df.insert(final_df.columns.get_loc('rej') + 1, 'new_col_1', 'KE')
-    final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', new_col_2_value)
+    final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', 'Charles')
     
     # Add a blank column after 'rej'
     final_df.insert(final_df.columns.get_loc('rej') + 3, 'Blank_Column', '')
@@ -105,12 +104,11 @@ def process_files(input_file):
     st.write(final_df)
     
     # Define the base output file name for PIM file
-pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
-counter = 1
-while os.path.exists(os.path.join(output_folder, pim_output_file)):
-    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
-    counter += 1
-
+    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
+    counter = 1
+    while os.path.exists(os.path.join(output_folder, pim_output_file)):
+        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
+        counter += 1
     
     # Create the PIM DataFrame
     pim_df = df[['PRODUCT_SET_SID', 'PARENTSKU']].copy()  # Use the correct column names from the input file
@@ -127,6 +125,9 @@ while os.path.exists(os.path.join(output_folder, pim_output_file)):
     # Sort PIM DataFrame by 'Status'
     pim_df.sort_values(by='Status', ascending=False, inplace=True)
     
+    # Save the PIM DataFrame to a CSV file
+    pim_output_path = os.path.join(output_folder, pim_output_file)
+    pim_df.to_csv(pim_output_path, index
     # Save the PIM DataFrame to a CSV file
     pim_output_path = os.path.join(output_folder, pim_output_file)
     pim_df.to_csv(pim_output_path, index=False, encoding='utf-8-sig')  # Specify encoding as utf-8-sig to preserve non-English characters
