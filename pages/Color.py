@@ -61,13 +61,78 @@ def main():
             df = pd.read_excel(uploaded_file, engine='openpyxl')
 
             # Read the category file
-            category_fas_df = pd.read_excel(category_file, engine='openpyxl')
+            category_fas
+import pandas as pd
+import os
+from datetime import datetime
+import streamlit as st
+import re
+
+def check_for_color(cell_text):
+    common_colors = ["navy", "black", "yellow", "red", "blue", "green", "orange", "purple", 
+                     "pink", "brown", "white", "gray", "grey", "khaki", "coffee", "gold", 
+                     "silver", "beige", "burgundy", "multi", "turquoise", "violet", "indigo", 
+                     "maroon", "olive", "lime", "teal", "aqua", "apricot", "wine", "mocha", 
+                     "multicolor", "multi", "plaid", "rose", "lily", "violet", "daisy", 
+                     "tulip", "sunflower", "iris", "orchid", "lavender", "marigold", 
+                     "poppy", "jasmine", "peony", "camellia", "hyacinth", "magnolia", 
+                     "daffodil", "chrysanthemum", "geranium", "dahlia", "transparent", 
+                     "clear", "rainbow", "caramel", "milk", "bronze", "argent", "chocolate", 
+                     "stawberry", "colorful", "peach", "magenta", "carbon", "Camouflage", 
+                     "camo", "stripes", "polka dot", "floral", "geometric", "animal print", 
+                     "tie-dye", "chevron", "camouflage", "herringbone", "paisley", 
+                     "checkered", "gingham", "tartan", "abstract", "batik", "ikat", "ombre", 
+                     "checked", "cyan", "ivory", "periwinkle", "chartreuse", "fandango", 
+                     "wisteria", "mauve", "vermilion", "viridian", "tangerine", "cerulean", 
+                     "heliotrope", "gamboge", "xanadu", "byzantium", "caput mortuum", 
+                     "persimmon", "coquelicot", "falu red", "zaffre", "wood", "mahogany", 
+                     "Auburn", "turmeric", "lemon", "skin", "nude", "walnut", "copper", 
+                     "chrome", "watermelon", "leopard", "lemon", "print", "tan", "Amber", 
+                     "Smoky", "Smoked", "coral", "tomato", "rusty", "rust", "steel", 
+                     "cream", "Champagne", "matte", "blossom", "graffiti", "sapphire",
+                     "velvet", "translucent", "metal", "metallic", "iridium", "chroma", "coral",
+                     "scarlet", "crimson", "ruby", "cherry", "burgundy", "vermilion", "maroon", 
+                     "carmine", "raspberry", "blue", "navy", "azure", "cobalt", "cerulean", 
+                     "indigo", "teal", "sky blue", "sapphire", "cyan", "green", "emerald", "lime", 
+                     "olive", "jade", "mint", "sage", "forest green", "hunter green", "kelly green", 
+                     "yellow", "lemon", "gold", "canary", "maize", "amber", "buttercup", "mustard", 
+                     "dandelion", "honey", "orange", "tangerine", "apricot", "peach", "iron", 
+                     "pumpkin", "terracotta", "rust", "salmon", "purple", "lavender", "lilac", "violet", 
+                     "mauve", "plum", "grape", "amethyst", "orchid", "magenta", "pink", "blush", "rose", 
+                     "bubblegum", "salmon pink", "coral pink", "fuchsia", "neon", "carnation", "peony", 
+                     "brown", "chocolate", "tan", "beige", "auburn", "chestnut", "coffee", "mahogany", "sienna", 
+                     "umber", "gray", "charcoal", "slate", "silver", "ash", "steel", "dove", "graphite", "pearl", 
+                     "smoke", "white"]
+
+    if pd.isna(cell_text):
+        return "No"
+    
+    for color in common_colors:
+        if re.search(re.escape(color), cell_text, flags=re.IGNORECASE):
+            return "Yes"
+
+    return "No"
+
+def main():
+    st.title("Upload Excel Files and Process")
+
+    uploaded_file = st.file_uploader("Upload your Excel file", type=['xlsx'])
+    category_file = st.file_uploader("Upload category FAS.xlsx", type=['xlsx'])
+
+    if uploaded_file and category_file:
+        try:
+            # Read the uploaded file
+            df = pd.read_excel(uploaded_file, engine='openpyxl')
+
+            # Read the category file
+            category_fas
+_df = pd.read_excel(category_file, engine='openpyxl')
 
             # Check if 'BRAND' column exists in the uploaded file
             if 'BRAND' in df.columns:
                 # Check if any value in 'BRAND' column is 'Generic'
                 if (df['BRAND'] == 'Generic').any():
-                    # Check if 'CATEGORY_CODE' column exists in the category file
+                    # Check if 'ID' column exists in the category file
                     if 'ID' in category_fas_df.columns:
                         # Create a new column 'check_Brand' in the output file
                         df['check_Brand'] = df.apply(lambda row:
@@ -85,11 +150,11 @@ def main():
             if 'COLOR' in df.columns:
                 df['Check_Color'] = df['COLOR'].apply(lambda x: check_for_color(str(x)))
 
-            # Save the output file
+            # Save the output file as Excel
             current_date = datetime.now().strftime('%Y-%m-%d')
-            output_file_name = f"Output_PIM_{current_date}.csv"
+            output_file_name = f"Output_PIM_{current_date}.xlsx"
             output_file_path = os.path.join(os.getcwd(), output_file_name)
-            df.to_csv(output_file_path, index=False, encoding='utf-8-sig')
+            df.to_excel(output_file_path, index=False)
 
             # Display success message and provide download link
             st.success(f"Output file '{output_file_name}' created.")
@@ -97,7 +162,7 @@ def main():
                 label="Download Output File",
                 data=open(output_file_path, 'rb').read(),
                 file_name=output_file_name,
-                mime='text/csv'
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
 
         except Exception as e:
