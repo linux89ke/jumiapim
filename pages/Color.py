@@ -97,12 +97,12 @@ def main():
 
             # Find a unique name for the output file
             output_file_name = f"Output_PIM_{current_date}.csv"
-            output_file_path = os.path.join(script_folder, output_file_name)
+            output_file_path = os.path.join(os.getcwd(), output_file_name)
 
             # Add a letter to the output file name if it already exists
             while os.path.exists(output_file_path):
                 output_file_name = output_file_name[:-4] + chr(ord(output_file_name[-5]) + 1) + ".csv"
-                output_file_path = os.path.join(script_folder, output_file_name)
+                output_file_path = os.path.join(os.getcwd(), output_file_name)
 
             # Create the output file with the combined results and current date in CSV format with 'utf-8-sig' encoding
             combined_df.to_csv(output_file_path, index=False, encoding='utf-8-sig')
