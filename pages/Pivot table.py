@@ -5,7 +5,7 @@ import streamlit as st
 import base64
 
 # Define a function to process the input and generate output files
-def process_files(input_file, selected_name):
+def process_files(input_file):
     # Define the output folder
     output_folder = f'PIM_output_{datetime.now().strftime("%Y-%m-%d_%H-%M")}'
     os.makedirs(output_folder, exist_ok=True)
@@ -82,9 +82,9 @@ def process_files(input_file, selected_name):
     final_df.insert(0, 'Week_Number', pd.to_datetime(final_df['Date_Column']).dt.isocalendar().week)
     final_df.insert(1, 'Formatted_Date', pd.to_datetime(final_df['Date_Column']).dt.strftime('%m/%d/%Y'))
     
-    # Add two columns after 'rej' with selected name and 'Charles'
+    # Add two columns after 'rej' with 'KE' and 'Charles'
     final_df.insert(final_df.columns.get_loc('rej') + 1, 'new_col_1', 'KE')
-    final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', selected_name)
+    final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', 'Charles')
     
     # Add a blank column after 'rej'
     final_df.insert(final_df.columns.get_loc('rej') + 3, 'Blank_Column', '')
@@ -125,4 +125,45 @@ def process_files(input_file, selected_name):
     # Sort PIM DataFrame by 'Status'
     pim_df.sort_values(by='Status', ascending=False, inplace=True)
     
-   
+    # Save the PIM DataFrame to a CSV file
+    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
+    counter = 1
+    while os.path.exists(os.path.join(output_folder, pim_output_file)):
+        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
+        counter += 1
+    
+    pim_output_path = os.path.join(output_folder, pim_output_file)
+    pim_df.to_csv(pim_output_path, index=False, encoding='utf-8-sig')  # Specify encoding as utf-8-sig to preserve non-English characters
+    
+    # Display success message with downloadable link for PIM file
+    st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
+    
+    return True  # Return True to indicate processing is completed
+
+# Function to generate HTML download link
+def get_download_link(file_path, link_text):
+    with open(file_path, "rb") as f:
+        file_bytes = f.read()
+    b64 = base64.b64encode(file_bytes).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="{os.path.basename(file_path)}">{link_text}</a>'
+
+# Streamlit app
+def main():
+    st.title("Excel Data Processing App")
+    st.write("This app processes Excel data and generates Pivot and PIM files.")
+    
+    # File uploader
+    uploaded_file = st.file_uploader("Upload an Excel file", type=["xls", "xlsx"])
+    
+    if uploaded_file is not None:
+        # Display file details
+        st.write("Uploaded file details:")
+        file_details = {"File Name": uploaded_file.name, "File Type": uploaded_file.type, "File Size": uploaded_file.size}
+        st.write(file_details)
+        
+        # Process the uploaded file
+        if process_files(uploaded_file):
+            st.stop()  # Stop the Streamlit app execution
+
+if __name__ == "__main__":
+    main()
