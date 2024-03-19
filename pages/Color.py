@@ -72,7 +72,15 @@ def main():
                     if 'URL_COLUMN_NAME' in df.columns:
                         df.drop(columns=['URL_COLUMN_NAME'], inplace=True)
 
-                    df['Check_brand'] = df['CATEGORY_CODE'].apply(lambda id_value: "No" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic" else ("Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found"))
+                    # Check if ID exists in CATEGORY_CODE column, then check BRAND
+                    if 'ID' in category_fas_df.columns:
+                        df['Check_brand'] = df['ID'].apply(lambda id_value: 
+                            "No" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and 
+                            category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic" 
+                            else "Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found"
+                        )
+                    else:
+                        st.error(f"Error processing file '{uploaded_file.name}': 'ID' column not found in category file.")
 
                     combined_df = pd.concat([combined_df, df], ignore_index=True)
                 except Exception as e:
