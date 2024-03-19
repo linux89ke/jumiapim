@@ -42,6 +42,7 @@ def check_for_color(cell_text):
                      "bone", "chiffon", "black", "jet", "onyx", "ebony", "charcoal black", "coal", "midnight", 
                      "obsidian", "raven", "soot"]
 
+   
     if pd.isna(cell_text):
         return "No"
     
@@ -54,54 +55,41 @@ def check_for_color(cell_text):
 def main():
     st.title("Upload Excel Files and Process")
 
-    # Allow user to upload 'category FAS.xlsx' file
-    category_fas_file = st.file_uploader("Upload 'category FAS.xlsx'", type=['xlsx'])
-
     uploaded_files = st.file_uploader("Upload your Excel files", type=['xlsx'], accept_multiple_files=True)
+    category_file = st.file_uploader("Upload category FAS.xlsx", type=['xlsx'])
 
-    if uploaded_files:
-        if not category_fas_file:
-            st.error("Please upload 'category FAS.xlsx'")
-            return
-
-        # Load 'category FAS.xlsx' into DataFrame
-        category_fas_df = pd.read_excel(category_fas_file, engine='openpyxl')
-
+    if uploaded_files and category_file:
         try:
-            # Initialize an empty DataFrame to store the combined results
+            category_fas_df = pd.read_excel(category_file, engine='openpyxl')
             combined_df = pd.DataFrame()
 
-            # Process each
-== "Generic" else ("Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found")
-
+            for uploaded_file in uploaded_files:
+                try:
+                    df = pd.read_excel(uploaded_file, engine='openpyxl')
+                    if 'COLOR' in df.columns:
+                        df['Check'] = df['COLOR'].apply(lambda x: check_for_color(str(x)))
                     
-                    # Drop the column containing URLs if it exists
                     if 'URL_COLUMN_NAME' in df.columns:
                         df.drop(columns=['URL_COLUMN_NAME'], inplace=True)
 
-                    # Concatenate the results to the combined DataFrame
+                    df['Check_brand'] = df['ID'].apply(lambda id_value: "No" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic" else ("Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found"))
+
                     combined_df = pd.concat([combined_df, df], ignore_index=True)
                 except Exception as e:
                     st.error(f"Error processing file '{uploaded_file.name}': {e}")
 
-            # Get the current date and format it as 'YYYY-MM-DD'
             current_date = datetime.now().strftime('%Y-%m-%d')
-
-            # Find a unique name for the output file
             output_file_name = f"Output_PIM_{current_date}.csv"
             output_file_path = os.path.join(os.getcwd(), output_file_name)
 
-            # Add a letter to the output file name if it already exists
             while os.path.exists(output_file_path):
                 output_file_name = output_file_name[:-4] + chr(ord(output_file_name[-5]) + 1) + ".csv"
                 output_file_path = os.path.join(os.getcwd(), output_file_name)
 
-            # Create the output file with the combined results and current date in CSV format with 'utf-8-sig' encoding
             combined_df.to_csv(output_file_path, index=False, encoding='utf-8-sig')
 
             st.success(f"Output file '{output_file_name}' created.")
 
-            # Provide a download link for the output file
             st.download_button(
                 label="Download Output File",
                 data=open(output_file_path, 'rb').read(),
