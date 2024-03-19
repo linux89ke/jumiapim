@@ -72,14 +72,14 @@ def main():
                     if 'URL_COLUMN_NAME' in df.columns:
                         df.drop(columns=['URL_COLUMN_NAME'], inplace=True)
 
-                    if 'CATEGORY_CODE' in df.columns and 'ID' in category_fas_df.columns:
+                    if 'CATEGORY_CODE' in df.columns and 'BRAND' in category_fas_df.columns:
                         df['Check_brand'] = df['CATEGORY_CODE'].apply(lambda id_value: 
-                            "No" if category_fas_df['ID'].isin([id_value]).any() and 
-                            category_fas_df.loc[category_fas_df['ID'] == id_value, 'BRAND'].iloc[0] == "Generic" 
-                            else "Yes" if category_fas_df['ID'].isin([id_value]).any() else "Not Found"
+                            "No" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and 
+                            category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic" 
+                            else "Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found"
                         )
                     else:
-                        st.error(f"Error processing file '{uploaded_file.name}': 'CATEGORY_CODE' or 'ID' column not found in respective files.")
+                        st.error(f"Error processing file '{uploaded_file.name}': 'CATEGORY_CODE' or 'BRAND' column not found in respective files.")
 
                     combined_df = pd.concat([combined_df, df], ignore_index=True)
                 except Exception as e:
