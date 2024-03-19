@@ -72,7 +72,7 @@ def main():
             combined_df = pd.DataFrame()
 
             # Process each
-== "Generic" else ("Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found"))
+== "Generic" else ("Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found")
 
                     
                     # Drop the column containing URLs if it exists
