@@ -127,9 +127,6 @@ def process_files(input_file):
     
     # Save the PIM DataFrame to a CSV file
     pim_output_path = os.path.join(output_folder, pim_output_file)
-    pim_df.to_csv(pim_output_path, index)
-    # Save the PIM DataFrame to a CSV file
-    pim_output_path = os.path.join(output_folder, pim_output_file)
     pim_df.to_csv(pim_output_path, index=False, encoding='utf-8-sig')  # Specify encoding as utf-8-sig to preserve non-English characters
     
     # Display success message with downloadable link for PIM file
