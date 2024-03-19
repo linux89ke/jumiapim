@@ -120,4 +120,7 @@ def process_files(input_file, selected_name):
 
 # Function to generate HTML download link
 def get_download_link(file_path, link_text):
-   
+    with open(file_path, "rb") as f:
+        file_bytes = f.read()
+    b64 = base64.b64encode(file_bytes).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="{os.path.basename(file_path)}">{link_text}</
