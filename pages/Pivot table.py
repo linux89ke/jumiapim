@@ -18,8 +18,14 @@ def process_files(input_file):
         pivot_output_file = f'{base_output_file}_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
         counter += 1
     
-    # Read the Excel file into a DataFrame
-    df = pd.read_excel(input_file)
+    # Read the file into a DataFrame (handle both Excel and CSV files)
+    if input_file.name.endswith('.xlsx') or input_file.name.endswith('.xls'):
+        df = pd.read_excel(input_file)
+    elif input_file.name.endswith('.csv'):
+        df = pd.read_csv(input_file)
+    else:
+        st.error("Unsupported file format. Please upload an Excel (.xls, .xlsx) or CSV file.")
+        return False
     
     # Specify the column names
     seller_name_col = 'SELLER_NAME'
@@ -144,10 +150,10 @@ def get_download_link(file_path, link_text):
 # Streamlit app
 def main():
     st.title("Excel Data Processing App")
-    st.write("This app processes Excel data and generates Pivot and PIM files.")
+    st.write("This app processes Excel/CSV data and generates Pivot and PIM files.")
     
     # File uploader
-    uploaded_file = st.file_uploader("Upload an Excel file", type=["xls", "xlsx"])
+    uploaded_file = st.file_uploader("Upload an Excel/CSV file", type=["xls", "xlsx", "csv"])
     
     if uploaded_file is not None:
         # Display file details
