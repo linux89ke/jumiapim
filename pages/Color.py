@@ -61,8 +61,11 @@ def main():
             df = pd.read_excel(uploaded_file, engine='openpyxl')
 
             # Read the category file
-            category_fas
-_df = pd.read_excel(category_file, engine='openpyxl')
+            category_fas_df = pd.read_excel(category_file, engine='openpyxl')
+
+           
+            # Read the category file
+            category_fas_df = pd.read_excel(category_file, engine='openpyxl')
 
             # Check if 'BRAND' column exists in the uploaded file
             if 'BRAND' in df.columns:
