@@ -22,11 +22,16 @@ def process_files(input_file):
     if input_file.name.endswith('.xlsx') or input_file.name.endswith('.xls'):
         df = pd.read_excel(input_file)
     elif input_file.name.endswith('.csv'):
-        df = pd.read_csv(input_file)
+        try:
+            df = pd.read_csv(input_file, encoding='utf-8')
+        except UnicodeDecodeError:
+            # If UTF-8 encoding fails, try 'latin-1' encoding
+            df = pd.read_csv(input_file, encoding='latin-1')
     else:
         st.error("Unsupported file format. Please upload an Excel (.xls, .xlsx) or CSV file.")
         return False
     
+ 
     # Specify the column names
     seller_name_col = 'SELLER_NAME'
     category_col = 'CATEGORY'
