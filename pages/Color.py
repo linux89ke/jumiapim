@@ -57,18 +57,21 @@ def main():
     uploaded_files = st.file_uploader("Upload your Excel files", type=['xlsx'], accept_multiple_files=True)
 
     if uploaded_files:
-        # Get the path of the script's folder
-        script_folder = os.path.dirname(os.path.realpath(__file__))
+        # Get the directory of the current script file
+        script_folder = os.path.dirname(os.path.abspath(__file__))
         
-        # Load data from category FAS.xlsx
+        # Construct the file path for 'category FAS.xlsx'
         category_fas_file = os.path.join(script_folder, "category FAS.xlsx")
-        try:
-            category_fas_df = pd.read_excel(category_fas_file, engine='openpyxl')
-        except Exception as e:
-            st.error(f"Error loading 'category FAS.xlsx': {e}")
+
+        # Check if the file exists
+        if not os.path.exists(category_fas_file):
+            st.error(f"Error: File 'category FAS.xlsx' not found in the specified directory.")
             return
 
         try:
+            # Load data from category FAS.xlsx
+            category_fas_df = pd.read_excel(category_fas_file, engine='openpyxl')
+
             # Initialize an empty DataFrame to store the combined results
             combined_df = pd.DataFrame()
 
