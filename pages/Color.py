@@ -71,17 +71,8 @@ def main():
             # Initialize an empty DataFrame to store the combined results
             combined_df = pd.DataFrame()
 
-            # Process each uploaded Excel file
-            for uploaded_file in uploaded_files:
-                try:
-                    df = pd.read_excel(uploaded_file, engine='openpyxl')  # Use openpyxl engine
-                    # Assuming 'COLOR' is the correct column name, adjust it if needed
-                    if 'COLOR' in df.columns:
-                        df['Check'] = df['COLOR'].apply(lambda x: check_for_color(str(x)))
-                    
-                    # Check for brand existence based on CATEGORY_CODE from category FAS.xlsx
-                    if 'ID' in df.columns and 'BRAND' in df.columns:
-                        df['Check_brand'] = df['ID'].apply(lambda id_value: "No" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic" else "Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found")
+            # Process each
+== "Generic" else "Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() else "Not Found")
                     
                     # Drop the column containing URLs if it exists
                     if 'URL_COLUMN_NAME' in df.columns:
@@ -121,4 +112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
