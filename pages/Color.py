@@ -54,26 +54,18 @@ def check_for_color(cell_text):
 def main():
     st.title("Upload Excel Files and Process")
 
+    # Allow user to upload 'category FAS.xlsx' file
+    category_fas_file = st.file_uploader("Upload 'category FAS.xlsx'", type=['xlsx'])
+
     uploaded_files = st.file_uploader("Upload your Excel files", type=['xlsx'], accept_multiple_files=True)
 
     if uploaded_files:
-        # Get the directory of the current script file
-        script_folder = os.path.dirname(os.path.abspath(__file__))
-        
-        # Construct the file path for 'category FAS.xlsx'
-        category_fas_file_path = os.path.join(script_folder, "category FAS.xlsx")
-
-        # Check if the file exists
-        if os.path.isfile(category_fas_file_path):
-            try:
-                # Load data from 'category FAS.xlsx'
-                category_fas_df = pd.read_excel(category_fas_file_path, engine='openpyxl')
-            except Exception as e:
-                st.error(f"Error loading 'category FAS.xlsx': {e}")
-                return
-        else:
-            st.error("Error: File 'category FAS.xlsx' not found in the specified directory.")
+        if not category_fas_file:
+            st.error("Please upload 'category FAS.xlsx'")
             return
+
+        # Load 'category FAS.xlsx' into DataFrame
+        category_fas_df = pd.read_excel(category_fas_file, engine='openpyxl')
 
         try:
             # Initialize an empty DataFrame to store the combined results
@@ -129,3 +121,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
