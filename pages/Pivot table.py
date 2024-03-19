@@ -119,8 +119,10 @@ def process_files(input_file, selected_name):
     st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
 
 # Function to generate HTML download link
+# Function to generate HTML download link
 def get_download_link(file_path, link_text):
     with open(file_path, "rb") as f:
         file_bytes = f.read()
     b64 = base64.b64encode(file_bytes).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="{os.path.basename(file_path)}">{link_text}</
+    return f'<a href="data:file/csv;base64,{b64}" download="{os.path.basename(file_path)}">{link_text}</a>'
+
