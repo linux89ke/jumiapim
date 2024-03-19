@@ -67,11 +67,11 @@ def main():
             if 'BRAND' in df.columns:
                 # Check if any value in 'BRAND' column is 'Generic'
                 if (df['BRAND'] == 'Generic').any():
-                    # Check if 'ID' column exists in the category file
+                    # Check if 'CATEGORY_CODE' column exists in the category file
                     if 'ID' in category_fas_df.columns:
                         # Create a new column 'check_Brand' in the output file
                         df['check_Brand'] = df.apply(lambda row:
-                            'No' if row['BRAND'] == 'Generic' and row['ID'] in category_fas_df['ID'].values else 'Yes',
+                            'No' if row['BRAND'] == 'Generic' and row['CATEGORY_CODE'] in category_fas_df['ID'].values else 'Yes',
                             axis=1
                         )
                     else:
@@ -85,11 +85,6 @@ def main():
             if 'COLOR' in df.columns:
                 df['Check_Color'] = df['COLOR'].apply(lambda x: check_for_color(str(x)))
 
-            # Save the output file
-            current_date = datetime.now().strftime('%Y-%m-%d')
-            output_file_name = f"Output_PIM_{current_date}.csv"
-            output_file_path = os.path.join(os.getcwd(), output_file_name)
-            df.to_csv(output_file_path, index=False, encoding='utf-8')
             # Save the output file
             current_date = datetime.now().strftime('%Y-%m-%d')
             output_file_name = f"Output_PIM_{current_date}.csv"
