@@ -63,10 +63,20 @@ def main():
         # Construct the file path for 'category FAS.xlsx'
         category_fas_file = os.path.join(script_folder, "category FAS.xlsx")
 
-        # Check if the file exists
-        if not os.path.exists(category_fas_file):
-            st.error(f"Error: File 'category FAS.xlsx' not found in the specified directory.")
-            return
+        # Check if 'category FAS.xlsx' exists in the script folder
+category_fas_file_path = "category FAS.xlsx"
+category_fas_df = None
+
+if os.path.isfile(category_fas_file_path):
+    try:
+        category_fas_df = pd.read_excel(category_fas_file_path, engine='openpyxl')
+    except Exception as e:
+        st.error(f"Error loading 'category FAS.xlsx': {e}")
+        return
+else:
+    st.error("Error: File 'category FAS.xlsx' not found in the specified directory.")
+    return
+
 
         try:
             # Load data from category FAS.xlsx
