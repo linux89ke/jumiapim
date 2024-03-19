@@ -91,11 +91,6 @@ def main():
             current_date = datetime.now().strftime('%Y-%m-%d')
             output_file_name = f"Output_PIM_{current_date}.csv"
             output_file_path = os.path.join(os.getcwd(), output_file_name)
-            df.to_csv(output_file_path, index=False, encoding='utf-8
-            # Save the output file
-            current_date = datetime.now().strftime('%Y-%m-%d')
-            output_file_name = f"Output_PIM_{current_date}.csv"
-            output_file_path = os.path.join(os.getcwd(), output_file_name)
             df.to_csv(output_file_path, index=False, encoding='utf-8-sig')
 
             # Display success message and provide download link
@@ -111,4 +106,4 @@ def main():
             st.error(f"Error: {e}")
 
 if __name__ == "__main__":
-    main()            
+    main()
