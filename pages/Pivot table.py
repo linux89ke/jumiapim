@@ -84,7 +84,7 @@ def process_files(input_file, selected_name):
     
     # Add two columns after 'rej' with selected name and 'Charles'
     final_df.insert(final_df.columns.get_loc('rej') + 1, 'Selected_Name', selected_name)
-    final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', 'Charles')
+    final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', selected_name)
     
     # Add a blank column after 'rej'
     final_df.insert(final_df.columns.get_loc('rej') + 3, 'Blank_Column', '')
@@ -126,5 +126,3 @@ def process_files(input_file, selected_name):
     pim_df.sort_values(by='Status', ascending=False, inplace=True)
     
     # Save the PIM DataFrame to a CSV file
-    pim_output_path = os.path.join(output_folder, pim_output_file)
-   
