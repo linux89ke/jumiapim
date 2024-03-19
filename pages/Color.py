@@ -65,7 +65,9 @@ def main():
             # Read the category file
             category_fas_df = pd.read_excel(category_file, engine='openpyxl')
 
-               # Check if any value in 'BRAND' column is 'Generic'
+            # Check if 'BRAND' column exists in the uploaded file
+            if 'BRAND' in df.columns:
+                # Check if any value in 'BRAND' column is 'Generic'
                 if (df['BRAND'] == 'Generic').any():
                     # Check if 'CATEGORY_CODE' column exists in the category file
                     if 'CATEGORY_CODE' in category_fas_df.columns:
