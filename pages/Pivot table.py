@@ -105,12 +105,12 @@ def process_files(input_file):
     st.write(final_df)
     
     # Define the base output file name for PIM file
-    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
-    counter = 1
-    while os.path.exists(os.path.join(output_folder, pim
-_output_file)):
-        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
-        counter += 1
+pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
+counter = 1
+while os.path.exists(os.path.join(output_folder, pim_output_file)):
+    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
+    counter += 1
+
     
     # Create the PIM DataFrame
     pim_df = df[['PRODUCT_SET_SID', 'PARENTSKU']].copy()  # Use the correct column names from the input file
