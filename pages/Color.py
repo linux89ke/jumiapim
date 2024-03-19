@@ -51,11 +51,7 @@ def check_for_color(cell_text):
             return "Yes"
 
     return "No"
-# Inside the for loop for processing uploaded files
-print("Uploaded File Columns:", df.columns.tolist())
 
-# Inside the try-except block for reading the category file
-print("Category File Columns:", category_fas_df.columns.tolist())
 def main():
     st.title("Upload Excel Files and Process")
 
