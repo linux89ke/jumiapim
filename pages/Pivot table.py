@@ -10,6 +10,14 @@ def process_files(input_file, selected_name):
     output_folder = f'PIM_output_{datetime.now().strftime("%Y-%m-%d_%H-%M")}'
     os.makedirs(output_folder, exist_ok=True)
     
+    # Check for existing files and generate unique filenames for Pivot and PIM output
+    base_output_file = 'Pivot_Date'
+    pivot_output_file = f'{base_output_file}_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
+    counter = 1
+    while os.path.exists(os.path.join(output_folder, pivot_output_file)):
+        pivot_output_file = f'{base_output_file}_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
+        counter += 1
+    
     # Read the Excel file into a DataFrame
     df = pd.read_excel(input_file)
     
@@ -31,6 +39,9 @@ def process_files(input_file, selected_name):
         'bra': 'Wrong Brand',
         'Wrong Variation - means size only': 'Wrong Variation - means size only'
     }
+    
+    # Update the reason mapping as per your requirement
+    reason_mapping.update({'col': 'Wrong Color'})
     
     # Create a pivot table without totals
     pivot_table = pd.pivot_table(df,
@@ -72,17 +83,16 @@ def process_files(input_file, selected_name):
     final_df.insert(1, 'Formatted_Date', pd.to_datetime(final_df['Date_Column']).dt.strftime('%m/%d/%Y'))
     
     # Add two columns after 'rej' with selected name and 'Charles'
-    final_df.insert(final_df.columns.get_loc('rej') + 1, 'Selected_Name', selected_name)
+    final_df.insert(final_df.columns.get_loc('rej') + 1, 'new_col_1', 'KE')
     final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', selected_name)
     
     # Add a blank column after 'rej'
     final_df.insert(final_df.columns.get_loc('rej') + 3, 'Blank_Column', '')
     
     # Reorder the columns, placing 'reason' at the end
-    final_df = final_df[['Week_Number', 'Formatted_Date', 'SELLER_NAME', 'CATEGORY', 'app', 'rej', 'Blank_Column', 'Selected_Name', 'new_col_2', 'reason']]
+    final_df = final_df[['Week_Number', 'Formatted_Date', 'SELLER_NAME', 'CATEGORY', 'app', 'rej', 'Blank_Column', 'new_col_1', 'new_col_2', 'reason']]
     
     # Save the Pivot DataFrame to a CSV file
-    pivot_output_file = f'Pivot_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
     pivot_output_path = os.path.join(output_folder, pivot_output_file)
     final_df.to_csv(pivot_output_path, index=False, encoding='utf-8-sig')  # Specify encoding as utf-8-sig to preserve non-English characters
     
@@ -94,8 +104,11 @@ def process_files(input_file, selected_name):
     st.write(final_df)
     
     # Define the base output file name for PIM file
-    pim_output_file = f'PIM_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
-    pim_output_path = os.path.join(output_folder, pim_output_file)
+    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
+    counter = 1
+    while os.path.exists(os.path.join(output_folder, pim_output_file)):
+        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
+        counter += 1
     
     # Create the PIM DataFrame
     pim_df = df[['PRODUCT_SET_SID', 'PARENTSKU']].copy()  # Use the correct column names from the input file
@@ -112,17 +125,4 @@ def process_files(input_file, selected_name):
     # Sort PIM DataFrame by 'Status'
     pim_df.sort_values(by='Status', ascending=False, inplace=True)
     
-    # Save the PIM DataFrame to a CSV file
-    pim_df.to_csv(pim_output_path, index=False, encoding='utf-8-sig')  # Specify encoding as utf-8-sig to preserve non-English characters
-    
-    # Display success message with downloadable link for PIM file
-    st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
-
-# Function to generate HTML download link
-# Function to generate HTML download link
-def get_download_link(file_path, link_text):
-    with open(file_path, "rb") as f:
-        file_bytes = f.read()
-    b64 = base64.b64encode(file_bytes).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="{os.path.basename(file_path)}">{link_text}</a>'
-
+   
