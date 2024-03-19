@@ -61,27 +61,21 @@ def main():
         script_folder = os.path.dirname(os.path.abspath(__file__))
         
         # Construct the file path for 'category FAS.xlsx'
-        category_fas_file = os.path.join(script_folder, "category FAS.xlsx")
+        category_fas_file_path = os.path.join(script_folder, "category FAS.xlsx")
 
         # Check if 'category FAS.xlsx' exists in the script folder
-        category_fas_file_path = "category FAS.xlsx"
-        category_fas_df = None
-
         if os.path.isfile(category_fas_file_path):
-        try:
-        category_fas_df = pd.read_excel(category_fas_file_path, engine='openpyxl')
-        except Exception as e:
-        st.error(f"Error loading 'category FAS.xlsx': {e}")
-        return
+            try:
+                # Load data from 'category FAS.xlsx'
+                category_fas_df = pd.read_excel(category_fas_file_path, engine='openpyxl')
+            except Exception as e:
+                st.error(f"Error loading 'category FAS.xlsx': {e}")
+                return
         else:
-        st.error("Error: File 'category FAS.xlsx' not found in the specified directory.")
-        return
-
+            st.error("Error: File 'category FAS.xlsx' not found in the specified directory.")
+            return
 
         try:
-            # Load data from category FAS.xlsx
-            category_fas_df = pd.read_excel(category_fas_file, engine='openpyxl')
-
             # Initialize an empty DataFrame to store the combined results
             combined_df = pd.DataFrame()
 
@@ -95,11 +89,13 @@ def main():
                     
                     # Check for brand existence based on CATEGORY_CODE from category FAS.xlsx
                     if 'ID' in df.columns and 'BRAND' in df.columns:
-                        df['Check_brand'] = df['ID'].apply(lambda id_value: "No" 
-                                                            if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and 
-                                                            category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic" 
-                                                            else "Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() 
-                                                            else "Not Found")
+                        df['Check_brand'] = df['ID'].apply(lambda id_value: "No
+                        if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic":
+                            return "No"
+                        else:
+                            return "Yes"
+                    else:
+                        return "Not Found")
                     
                     # Drop the column containing URLs if it exists
                     if 'URL_COLUMN_NAME' in df.columns:
