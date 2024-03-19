@@ -59,6 +59,14 @@ def main():
     if uploaded_files:
         # Get the path of the script's folder
         script_folder = os.path.dirname(os.path.realpath(__file__))
+        
+        # Load data from category FAS.xlsx
+        category_fas_file = os.path.join(script_folder, "category FAS.xlsx")
+        try:
+            category_fas_df = pd.read_excel(category_fas_file, engine='openpyxl')
+        except Exception as e:
+            st.error(f"Error loading 'category FAS.xlsx': {e}")
+            return
 
         try:
             # Initialize an empty DataFrame to store the combined results
@@ -71,6 +79,14 @@ def main():
                     # Assuming 'COLOR' is the correct column name, adjust it if needed
                     if 'COLOR' in df.columns:
                         df['Check'] = df['COLOR'].apply(lambda x: check_for_color(str(x)))
+                    
+                    # Check for brand existence based on CATEGORY_CODE from category FAS.xlsx
+                    if 'ID' in df.columns and 'BRAND' in df.columns:
+                        df['Check_brand'] = df['ID'].apply(lambda id_value: "No" 
+                                                            if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() and 
+                                                            category_fas_df.loc[category_fas_df['CATEGORY_CODE'] == id_value, 'BRAND'].iloc[0] == "Generic" 
+                                                            else "Yes" if category_fas_df['CATEGORY_CODE'].isin([id_value]).any() 
+                                                            else "Not Found")
                     
                     # Drop the column containing URLs if it exists
                     if 'URL_COLUMN_NAME' in df.columns:
