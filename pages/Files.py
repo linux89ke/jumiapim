@@ -4,6 +4,14 @@ import os
 from datetime import datetime
 
 def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
+    # Check if sellers Excel file and at least one CSV file are uploaded
+    if sellers_file is None:
+        st.write("Please upload the sellers Excel file.")
+        return
+    if len(csv_files) == 0:
+        st.write("Please upload at least one CSV file.")
+        return
+
     # Initialize an empty DataFrame with the additional columns
     result_df = pd.DataFrame(columns=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
 
@@ -95,7 +103,4 @@ sellers_file = st.file_uploader("Upload sellers Excel file:")
 category_tree_file = "category_tree.xlsx"  # Fixed file path
 csv_files = st.file_uploader("Upload CSV files:", accept_multiple_files=True)
 if st.button("Merge CSV Files"):
-    if sellers_file is not None and len(csv_files) > 0:
-        merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
-    else:
-        st.write("Please upload sellers Excel file and at least one CSV file.")
+    merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
