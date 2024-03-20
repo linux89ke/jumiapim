@@ -25,6 +25,14 @@ def split_and_save_excel(input_file, chunk_size=9998):
     script_directory = os.path.dirname(os.path.abspath(__file__))
     reject_reasons_file_path = os.path.join(script_directory, "reject reasons.xlsx")
 
+    # Check if the 'reject reasons.xlsx' file exists
+    if not os.path.exists(reject_reasons_file_path):
+        st.error("The 'reject reasons.xlsx' file does not exist.")
+        return [], 0
+
+    # Read the data from the 'reject reasons.xlsx' file
+    reject_reasons_df = pd.read_excel(reject_reasons_file_path)
+
     # Check if the required sheet "ProductSets" is present
     if "ProductSets" not in excel_file.sheet_names:
         st.warning("Input file doesn't have a 'ProductSets' sheet. Creating an empty sheet.")
@@ -32,13 +40,6 @@ def split_and_save_excel(input_file, chunk_size=9998):
     else:
         # Read the ProductSets sheet
         product_sets_df = excel_file.parse("ProductSets")
-
-    # Read the data from the 'reject reasons.xlsx' file
-    if os.path.exists(reject_reasons_file_path):
-        reject_reasons_df = pd.read_excel(reject_reasons_file_path)
-    else:
-        st.error("The 'reject reasons.xlsx' file does not exist.")
-        return [], 0
 
     # Get total number of rows in the input file
     total_rows = 0
