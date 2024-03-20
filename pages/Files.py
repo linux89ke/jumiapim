@@ -11,7 +11,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     for file in csv_files:
         try:
             # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
-            df = pd.read_csv(file, delimiter=',', usecols=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
+            df = pd.read_csv(file, delimiter=None, usecols=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
 
             # Check if the DataFrame has any data before processing
             if not df.empty:
