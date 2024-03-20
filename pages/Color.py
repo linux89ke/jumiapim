@@ -20,9 +20,15 @@ def check_for_color(cell_text, common_colors):
     return "No"
 
 def main():
-    st.title("Upload Excel Files and Process")
+    st.title("Process Excel Files")
+
+    # Load common colors from text file
     common_colors_file = "common_colors.txt"
     common_colors = load_colors_from_txt(common_colors_file)
+
+    # Read category file
+    category_file = "category FAS.xlsx"
+    category_fas_df = pd.read_excel(category_file, engine='openpyxl')
 
     uploaded_file = st.file_uploader("Upload your Excel file", type=['xlsx'])
 
@@ -31,23 +37,15 @@ def main():
             # Read the uploaded file
             df = pd.read_excel(uploaded_file, engine='openpyxl')
 
-            # Read the category file
-            category_file = "category FAS.xlsx"
-            category_fas_df = pd.read_excel(category_file, engine='openpyxl')
-
             # Check if 'BRAND' column exists in the uploaded file
             if 'BRAND' in df.columns:
                 # Check if any value in 'BRAND' column is 'Generic'
                 if df['BRAND'].str.lower().eq('generic').any():
-                    # Check if 'ID' column exists in the category file
-                    if 'ID' in category_fas_df.columns:
-                        # Create a new column 'check_Brand' in the output file
-                        df['check_Brand'] = df.apply(lambda row:
-                            'No' if row['BRAND'].lower() == 'generic' and row['CATEGORY_CODE'] in category_fas_df['ID'].values else 'Yes',
-                            axis=1
-                        )
-                    else:
-                        st.error("Error: 'ID' column not found in the category file.")
+                    # Create a new column 'check_Brand' in the output file
+                    df['check_Brand'] = df.apply(lambda row:
+                        'No' if row['BRAND'].lower() == 'generic' and row['CATEGORY_CODE'] in category_fas_df['ID'].values else 'Yes',
+                        axis=1
+                    )
                 else:
                     st.error("Error: No value 'Generic' found in 'BRAND' column of the uploaded file.")
             else:
@@ -55,7 +53,13 @@ def main():
 
             # Now, let's check for colors
             if 'COLOR' in df.columns:
-                df['Check_Color'] = df['COLOR'].apply(lambda x: check_for_color(str(x), common_colors))
+                progress_bar = st.progress(0)
+                total_rows = df.shape[0]
+                processed_rows = 0
+                for index, row in df.iterrows():
+                    df.at[index, 'Check_Color'] = check_for_color(str(row['COLOR']), common_colors)
+                    processed_rows += 1
+                    progress_bar.progress(processed_rows / total_rows)
 
             # Save the output file as Excel
             current_date = datetime.now().strftime('%Y-%m-%d')
