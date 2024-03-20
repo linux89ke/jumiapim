@@ -1,7 +1,8 @@
 import pandas as pd
-import streamlit as st
-from datetime import datetime
 import os
+from datetime import datetime
+import streamlit as st
+import re
 
 def load_colors_from_txt(file_path):
     with open(file_path, 'r') as file:
@@ -74,10 +75,6 @@ def main():
                 file_name=output_file_name,
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-
-            # Next button for navigation to Pivot_table.py
-            if st.button("Next"):
-                st.markdown("<iframe src='https://jumiapim.streamlit.app/Pivot_table' width='1200' height='800'></iframe>", unsafe_allow_html=True)
 
         except Exception as e:
             st.error(f"Error: {e}")
