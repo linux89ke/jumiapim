@@ -68,7 +68,7 @@ def split_and_save_excel(input_file, chunk_size=9998):
         logging.info(f"Saved {len(output_files)} files.")
 
         # Create a zip file
-        zip_file_name = "output_files.zip"
+        zip_file_name = f"PIM_Files_{current_date}.zip"
         with zipfile.ZipFile(zip_file_name, "w") as zipf:
             for file in output_files:
                 zipf.write(file)
