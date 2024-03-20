@@ -25,14 +25,14 @@ def main():
     common_colors = load_colors_from_txt(common_colors_file)
 
     uploaded_file = st.file_uploader("Upload your Excel file", type=['xlsx'])
-    category_file = st.file_uploader("Upload category FAS.xlsx", type=['xlsx'])
 
-    if uploaded_file and category_file:
+    if uploaded_file:
         try:
             # Read the uploaded file
             df = pd.read_excel(uploaded_file, engine='openpyxl')
 
             # Read the category file
+            category_file = "category FAS.xlsx"
             category_fas_df = pd.read_excel(category_file, engine='openpyxl')
 
             # Check if 'BRAND' column exists in the uploaded file
