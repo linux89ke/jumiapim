@@ -7,7 +7,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     # Initialize an empty DataFrame with the additional columns
     result_df = pd.DataFrame(columns=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
 
-    # Iterate through each CSV file
+    # Iterate through each uploaded CSV file
     for file in csv_files:
         try:
             # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
@@ -19,13 +19,13 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
                 result_df = pd.concat([result_df, df])
 
             else:
-                st.warning(f"Empty DataFrame in file: {file}. Skipping...")
+                st.warning(f"Empty DataFrame in file: {file.name}. Skipping...")
 
         except pd.errors.EmptyDataError:
-            st.warning(f"No data to parse in file: {file}. Skipping...")
+            st.warning(f"No data to parse in file: {file.name}. Skipping...")
             continue
         except pd.errors.ParserError as e:
-            st.error(f"Error reading file: {file}. Skipping...")
+            st.error(f"Error reading file: {file.name}. Skipping...")
             st.error(f"Error details: {e}")
             continue
 
@@ -82,13 +82,16 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     result_df.to_csv(output_file, index=False)
     st.success(f"Merge completed. Merged data saved to {output_file}")
 
+    # Provide a download link for the merged result
+    st.markdown(f"### [Download Merged Data]({output_file})")
+
 if __name__ == "__main__":
     # Specify the output file name
     output_file = "Merged_skus_date.csv"
 
     # File uploader for CSV files
-    st.sidebar.title("Upload CSV Files")
-    csv_files = st.sidebar.file_uploader("Upload CSV files", type="csv", accept_multiple_files=True)
+    st.title("Merge CSV Files")
+    csv_files = st.file_uploader("Upload CSV files", type="csv", accept_multiple_files=True)
 
     if csv_files:
         merge_csv_files(output_file, csv_files, "sellers.xlsx", "category_tree.xlsx")
