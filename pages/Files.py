@@ -13,7 +13,17 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
         return
 
     # Initialize an empty DataFrame with the additional columns
-    result_df = pd.DataFrame(columns=["SellerName", "Jumia SKU", "Name", "Brand", "PrimaryCategory"])
+    result_df = pd.DataFrame(columns=[
+        "SellerName", "Jumia SKU", "Name", "Brand", "Model", "Color", "PrimaryCategory", 
+        "Categories", "BrowseNodes", "TaxClass", "ColorFamily", "MainMaterial", "ProductMeasures",
+        "ProductWeight", "Description", "ShortDescription", "PackageContent", "CareLabel", 
+        "YoutubeId", "AirCoolerType", "WashingMachineType", "VentingType", "Variation", 
+        "StoveType", "JuicerType", "InstallationType", "FridgeType", "FreezerType", "FanType", 
+        "DefrostType", "CookerType", "BlenderType", "ShopType", "ProductionCountry", 
+        "ShelfLifeManaged", "MinimumShelfLife", "SaleStartDate", "SalePrice", "SaleEndDate", 
+        "ProductWarranty", "ProductId", "Price", "SellerSku", "ParentSku", "Quantity", 
+        "CreatedAt", "UpdatedAt", "ProductGroup", "Status"
+    ])
 
     # Iterate through each CSV file
     for file in csv_files:
@@ -23,12 +33,12 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
                 st.write(f"Skipping empty CSV file: {file.name}")
                 continue
 
-            # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
-            df = pd.read_csv(file, usecols=["SellerName", "Jumia SKU", "Name", "Brand", "PrimaryCategory"])
+            # Read the CSV file into a DataFrame
+            df = pd.read_csv(file)
 
             # Check if the DataFrame has any data before processing
             if not df.empty:
-                # Concatenate the selected columns to the result DataFrame
+                # Concatenate the DataFrame to the result DataFrame
                 result_df = pd.concat([result_df, df])
 
             else:
@@ -38,10 +48,6 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
             st.write(f"No data to parse in file: {file.name}. Skipping...")
             continue
         except pd.errors.ParserError as e:
-            st.write(f"Error reading file: {file.name}. Skipping...")
-            st.write(f"Error details: {e}")
-            continue
-        except ValueError as e:
             st.write(f"Error reading file: {file.name}. Skipping...")
             st.write(f"Error details: {e}")
             continue
@@ -81,7 +87,17 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
         st.write("'Category' column not found in category_tree_df. Skipping update.")
 
     # Rearrange the columns
-    result_df = result_df[["SellerName", "Jumia SKU", "Name", "Brand", "PrimaryCategory"]]
+    result_df = result_df[[
+        "SellerName", "Jumia SKU", "Name", "Brand", "Model", "Color", "PrimaryCategory", 
+        "Categories", "BrowseNodes", "TaxClass", "ColorFamily", "MainMaterial", "ProductMeasures",
+        "ProductWeight", "Description", "ShortDescription", "PackageContent", "CareLabel", 
+        "YoutubeId", "AirCoolerType", "WashingMachineType", "VentingType", "Variation", 
+        "StoveType", "JuicerType", "InstallationType", "FridgeType", "FreezerType", "FanType", 
+        "DefrostType", "CookerType", "BlenderType", "ShopType", "ProductionCountry", 
+        "ShelfLifeManaged", "MinimumShelfLife", "SaleStartDate", "SalePrice", "SaleEndDate", 
+        "ProductWarranty", "ProductId", "Price", "SellerSku", "ParentSku", "Quantity", 
+        "CreatedAt", "UpdatedAt", "ProductGroup", "Status"
+    ]]
 
     # Generate the current date to include in the output file name
     current_date = datetime.now().strftime("%Y%m%d")
@@ -100,6 +116,6 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     st.write("Merged file saved successfully.")
 
 # Streamlit UI
-st.title("CSV
+st.title("CSV File Merger")
 
-         
+output_file = st.text_input("Enter output file name:", "
