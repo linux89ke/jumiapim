@@ -17,7 +17,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
                 st.write(f"Skipping empty CSV file: {file.name}")
                 continue
 
-            df = pd.read_csv(file, delimiter='\t', usecols=["SellerName", "Name", "SellerSku", "PrimaryCategory", "Brand"])
+            df = pd.read_csv(file, delimiter='\t', usecols=["SellerName", "Name", "SellerSku", "PrimaryCategory", "Brand"], encoding='utf-8')
 
             if not df.empty:
                 result_df = pd.concat([result_df, df])
@@ -29,6 +29,10 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
             continue
         except pd.errors.ParserError as e:
             st.write(f"Error reading file: {file.name}. Skipping...")
+            st.write(f"Error details: {e}")
+            continue
+        except UnicodeDecodeError as e:
+            st.write(f"Error decoding file: {file.name}. Skipping...")
             st.write(f"Error details: {e}")
             continue
 
