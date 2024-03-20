@@ -17,7 +17,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
                 st.write(f"Skipping empty CSV file: {file.name}")
                 continue
 
-            df = pd.read_csv(file, delimiter=';', usecols=["SellerName", "Name", "SellerSku", "PrimaryCategory", "Brand"])
+            df = pd.read_csv(file, delimiter='\t', usecols=["SellerName", "Name", "SellerSku", "PrimaryCategory", "Brand"])
 
             if not df.empty:
                 result_df = pd.concat([result_df, df])
