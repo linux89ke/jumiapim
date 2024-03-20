@@ -128,8 +128,10 @@ def process_files(input_file):
     # Apply mapping for 'reason' to generate 'Status' and 'Reason' columns
     pim_df['Status'] = df['reason'].apply(lambda x: 'Approved' if pd.isna(x) or x == '' else 'Rejected')
     pim_df['Reason'] = df['reason'].map(reason_mapping).fillna('Approved')  # Fill blank reasons with 'Approved'
-    pim_df.loc[pim_df['Status'] == '
-# Apply specific mappings for certain reasons
+    pim_df.loc[pim_df['Status'] == 'Approved',
+['Reason', 'Comment']] = ''
+    
+    # Apply specific mappings for certain reasons
     pim_df.loc[pim_df['Reason'] == 'Wrong Brand', 'Comment'] = 'Please use Fashion as brand name'
     
     # Sort PIM DataFrame by 'Status'
