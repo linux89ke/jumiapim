@@ -21,6 +21,11 @@ def split_and_save_excel(input_file, chunk_size=9998):
         st.error("Error reading Excel file. Please make sure it's a valid Excel file.")
         return [], 0
 
+    # Check if the required sheets are present
+    if "ProductSets" not in excel_file.sheet_names or "RejectionReasons" not in excel_file.sheet_names:
+        st.error("Input file must have 'ProductSets' and 'RejectionReasons' sheets.")
+        return [], 0
+
     # Get total number of rows in the input file
     total_rows = 0
     for sheet_name in excel_file.sheet_names:
@@ -58,7 +63,9 @@ def split_and_save_excel(input_file, chunk_size=9998):
                 output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
                 with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
                     chunk.to_excel(writer, sheet_name=sheet_name, index=False)
-                    excel_file.parse('RejectionReasons').to_excel(writer, sheet_name='RejectionReasons', index=False)
+                    # Create the RejectionReasons sheet and write the same data as in the original file
+                    original_rejection_reasons = excel_file.parse('RejectionReasons')
+                    original_rejection_reasons.to_excel(writer, sheet_name='RejectionReasons', index=False)
                 output_files.append(output_file_name)
 
                 # Update progress bar
