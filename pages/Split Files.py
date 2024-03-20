@@ -6,6 +6,7 @@ import logging
 import zipfile
 import os
 import math
+import base64
 
 # Function to estimate the number of output files
 def estimate_output_files(total_rows, chunk_size):
@@ -66,6 +67,29 @@ def split_and_save_excel(input_file, chunk_size=9998):
 
         logging.info(f"Saved {len(output_files)} files.")
 
+        # Create a zip file
+        zip_file_name = "output_files.zip"
+        with zipfile.ZipFile(zip_file_name, "w") as zipf:
+            for file in output_files:
+                zipf.write(file)
+
+        # Download the zipped file
+        with open(zip_file_name, "rb") as f:
+            zip_data = f.read()
+            b64_zip_data = base64.b64encode(zip_data).decode('utf-8')
+            href = f'<a href="data:application/zip;base64,{b64_zip_data}" download="{zip_file_name}">Click here to download the zipped file</a>'
+            st.markdown(href, unsafe_allow_html=True)
+
+        # Display individual files as downloadable links
+        st.write("Individual Files:")
+        for file in output_files:
+            st.write(file)
+            with open(file, "rb") as f:
+                st.download_button(label="Download", data=f, file_name=file)
+
+        # Remove the zip file
+        os.remove(zip_file_name)
+
     return output_files, total_rows
 
 # Set up logging configuration
@@ -79,22 +103,3 @@ uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
 if uploaded_file is not None:
     st.write("Uploaded file:", uploaded_file.name)
     output_files, total_rows = split_and_save_excel(uploaded_file)
-
-    if len(output_files) > 0:
-        st.write("Splitting complete! Number of output files:", len(output_files))
-
-        st.write("Output Files:")
-        for file in output_files:
-            st.write(file)
-            with open(file, "rb") as f:
-                st.download_button(label="Download", data=f, file_name=file)
-
-        if st.button("All Files (Zipped)"):
-            with st.spinner("Zipping files..."):
-                zip_file_name = "output_files.zip"
-                with zipfile.ZipFile(zip_file_name, "w") as zipf:
-                    for file in output_files:
-                        zipf.write(file)
-                with open(zip_file_name, "rb") as f:
-                    st.download_button(label="Download Zip", data=f, file_name=zip_file_name)
-                os.remove(zip_file_name)
