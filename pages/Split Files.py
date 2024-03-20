@@ -21,10 +21,17 @@ def split_and_save_excel(input_file, chunk_size=9998):
         st.error("Error reading Excel file. Please make sure it's a valid Excel file.")
         return [], 0
 
-    # Check if the required sheets are present
-    if "ProductSets" not in excel_file.sheet_names or "RejectionReasons" not in excel_file.sheet_names:
-        st.error("Input file must have 'ProductSets' and 'RejectionReasons' sheets.")
-        return [], 0
+    # Read the data from the 'reject reasons.xlsx' file
+    reject_reasons_file_path = os.path.join(os.path.dirname(__file__), "reject reasons.xlsx")
+    reject_reasons_df = pd.read_excel(reject_reasons_file_path)
+
+    # Check if the required sheet "ProductSets" is present
+    if "ProductSets" not in excel_file.sheet_names:
+        st.warning("Input file doesn't have a 'ProductSets' sheet. Creating an empty sheet.")
+        product_sets_df = pd.DataFrame(columns=["Placeholder"])
+    else:
+        # Read the ProductSets sheet
+        product_sets_df = excel_file.parse("ProductSets")
 
     # Get total number of rows in the input file
     total_rows = 0
@@ -53,7 +60,7 @@ def split_and_save_excel(input_file, chunk_size=9998):
         progress_increment = 100 / total_rows
 
         for sheet_name in excel_file.sheet_names:
-            if sheet_name == 'RejectionReasons':
+            if sheet_name == 'ProductSets':
                 continue
             
             df = excel_file.parse(sheet_name)
@@ -62,10 +69,9 @@ def split_and_save_excel(input_file, chunk_size=9998):
             for i, chunk in enumerate(df_chunks):
                 output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
                 with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
-                    chunk.to_excel(writer, sheet_name=sheet_name, index=False)
-                    # Create the RejectionReasons sheet and write the same data as in the original file
-                    original_rejection_reasons = excel_file.parse('RejectionReasons')
-                    original_rejection_reasons.to_excel(writer, sheet_name='RejectionReasons', index=False)
+                    chunk.to_excel(writer, sheet_name='ProductSets', index=False)
+                    product_sets_df.to_excel(writer, sheet_name='ProductSets', index=False)
+                    reject_reasons_df.to_excel(writer, sheet_name='RejectionReasons', index=False)
                 output_files.append(output_file_name)
 
                 # Update progress bar
