@@ -71,12 +71,21 @@ if uploaded_file is not None:
     st.write("Uploaded file:", uploaded_file.name)
     output_files, total_rows = split_and_save_excel(uploaded_file)
 
-    if st.button("All Files (Zipped)") and len(output_files) > 0:
-        with st.spinner("Zipping files..."):
-            zip_file_name = "output_files.zip"
-            with zipfile.ZipFile(zip_file_name, "w") as zipf:
-                for file in output_files:
-                    zipf.write(file)
-            with open(zip_file_name, "rb") as f:
-                st.download_button(label="Download Zip", data=f, file_name=zip_file_name)
-            os.remove(zip_file_name)
+    if len(output_files) > 0:
+        st.write("Splitting complete! Number of output files:", len(output_files))
+
+        st.write("Output Files:")
+        for file in output_files:
+            st.write(file)
+            with open(file, "rb") as f:
+                st.download_button(label="Download", data=f, file_name=file)
+
+        if st.button("All Files (Zipped)"):
+            with st.spinner("Zipping files..."):
+                zip_file_name = "output_files.zip"
+                with zipfile.ZipFile(zip_file_name, "w") as zipf:
+                    for file in output_files:
+                        zipf.write(file)
+                with open(zip_file_name, "rb") as f:
+                    st.download_button(label="Download Zip", data=f, file_name=zip_file_name)
+                os.remove(zip_file_name)
