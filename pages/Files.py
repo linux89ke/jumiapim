@@ -20,7 +20,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
         try:
             # Check if the file is not empty and has a valid CSV file extension
             if pd.read_csv(file, nrows=1).empty:
-                st.write(f"Skipping empty CSV file: {file}")
+                st.write(f"Skipping empty CSV file: {file.name}")
                 continue
 
             # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
@@ -32,13 +32,13 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
                 result_df = pd.concat([result_df, df])
 
             else:
-                st.write(f"Empty DataFrame in file: {file}. Skipping...")
+                st.write(f"Empty DataFrame in file: {file.name}. Skipping...")
 
         except pd.errors.EmptyDataError:
-            st.write(f"No data to parse in file: {file}. Skipping...")
+            st.write(f"No data to parse in file: {file.name}. Skipping...")
             continue
         except pd.errors.ParserError as e:
-            st.write(f"Error reading file: {file}. Skipping...")
+            st.write(f"Error reading file: {file.name}. Skipping...")
             st.write(f"Error details: {e}")
             continue
 
@@ -46,7 +46,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     try:
         sellers_df = pd.read_excel(sellers_file)
     except pd.errors.EmptyDataError:
-        st.write(f"No data to parse in file: {sellers_file}. Skipping...")
+        st.write(f"No data to parse in file: {sellers_file.name}. Skipping...")
         sellers_df = pd.DataFrame(columns=["SellerName", "Seller_ID"])
 
     # Perform a VLOOKUP to add the "Seller_ID" column based on "SellerName"
