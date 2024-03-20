@@ -4,42 +4,12 @@ from datetime import datetime
 import streamlit as st
 import re
 
-def check_for_color(cell_text):
-    common_colors = ["navy", "black", "yellow", "red", "blue", "green", "orange", "purple", 
-                     "pink", "brown", "white", "gray", "grey", "khaki", "coffee", "gold", 
-                     "silver", "beige", "burgundy", "multi", "turquoise", "violet", "indigo", 
-                     "maroon", "olive", "lime", "teal", "aqua", "apricot", "wine", "mocha", 
-                     "multicolor", "multi", "plaid", "rose", "lily", "violet", "daisy", 
-                     "tulip", "sunflower", "iris", "orchid", "lavender", "marigold", 
-                     "poppy", "jasmine", "peony", "camellia", "hyacinth", "magnolia", 
-                     "daffodil", "chrysanthemum", "geranium", "dahlia", "transparent", 
-                     "clear", "rainbow", "caramel", "milk", "bronze", "argent", "chocolate", 
-                     "stawberry", "colorful", "peach", "magenta", "carbon", "Camouflage", 
-                     "camo", "stripes", "polka dot", "floral", "geometric", "animal print", 
-                     "tie-dye", "chevron", "camouflage", "herringbone", "paisley", 
-                     "checkered", "gingham", "tartan", "abstract", "batik", "ikat", "ombre", 
-                     "checked", "cyan", "ivory", "periwinkle", "chartreuse", "fandango", 
-                     "wisteria", "mauve", "vermilion", "viridian", "tangerine", "cerulean", 
-                     "heliotrope", "gamboge", "xanadu", "byzantium", "caput mortuum", 
-                     "persimmon", "coquelicot", "falu red", "zaffre", "wood", "mahogany", 
-                     "Auburn", "turmeric", "lemon", "skin", "nude", "walnut", "copper", 
-                     "chrome", "watermelon", "leopard", "lemon", "print", "tan", "Amber", 
-                     "Smoky", "Smoked", "coral", "tomato", "rusty", "rust", "steel", 
-                     "cream", "Champagne", "matte", "blossom", "graffiti", "sapphire",
-                     "velvet", "translucent", "metal", "metallic", "iridium", "chroma", "coral",
-                     "scarlet", "crimson", "ruby", "cherry", "burgundy", "vermilion", "maroon", 
-                     "carmine", "raspberry", "blue", "navy", "azure", "cobalt", "cerulean", 
-                     "indigo", "teal", "sky blue", "sapphire", "cyan", "green", "emerald", "lime", 
-                     "olive", "jade", "mint", "sage", "forest green", "hunter green", "kelly green", 
-                     "yellow", "lemon", "gold", "canary", "maize", "amber", "buttercup", "mustard", 
-                     "dandelion", "honey", "orange", "tangerine", "apricot", "peach", "iron", 
-                     "pumpkin", "terracotta", "rust", "salmon", "purple", "lavender", "lilac", "violet", 
-                     "mauve", "plum", "grape", "amethyst", "orchid", "magenta", "pink", "blush", "rose", 
-                     "bubblegum", "salmon pink", "coral pink", "fuchsia", "neon", "carnation", "peony", 
-                     "brown", "chocolate", "tan", "beige", "auburn", "chestnut", "coffee", "mahogany", "sienna", 
-                     "umber", "gray", "charcoal", "slate", "silver", "ash", "steel", "dove", "graphite", "pearl", 
-                     "smoke", "white"]
+def load_colors_from_txt(file_path):
+    with open(file_path, 'r') as file:
+        colors = [line.strip() for line in file.readlines()]
+    return colors
 
+def check_for_color(cell_text, common_colors):
     if pd.isna(cell_text):
         return "No"
     
@@ -51,6 +21,8 @@ def check_for_color(cell_text):
 
 def main():
     st.title("Upload Excel Files and Process")
+    common_colors_file = "common_colors.txt"
+    common_colors = load_colors_from_txt(common_colors_file)
 
     uploaded_file = st.file_uploader("Upload your Excel file", type=['xlsx'])
     category_file = st.file_uploader("Upload category FAS.xlsx", type=['xlsx'])
@@ -60,10 +32,6 @@ def main():
             # Read the uploaded file
             df = pd.read_excel(uploaded_file, engine='openpyxl')
 
-            # Read the category file
-            category_fas_df = pd.read_excel(category_file, engine='openpyxl')
-
-           
             # Read the category file
             category_fas_df = pd.read_excel(category_file, engine='openpyxl')
 
@@ -87,7 +55,7 @@ def main():
 
             # Now, let's check for colors
             if 'COLOR' in df.columns:
-                df['Check_Color'] = df['COLOR'].apply(lambda x: check_for_color(str(x)))
+                df['Check_Color'] = df['COLOR'].apply(lambda x: check_for_color(str(x), common_colors))
 
             # Save the output file as Excel
             current_date = datetime.now().strftime('%Y-%m-%d')
