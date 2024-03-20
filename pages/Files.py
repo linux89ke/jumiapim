@@ -45,6 +45,8 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
         st.write(f"No data to parse in file: {sellers_file}. Skipping...")
         sellers_df = pd.DataFrame(columns=["SellerName", "Seller_ID"])
 
+    st.write("Loaded sellers data:", sellers_df.head())
+
     # Perform a VLOOKUP to add the "Seller_ID" column based on "SellerName"
     result_df = result_df.merge(sellers_df[['SellerName', 'Seller_ID']], on='SellerName', how='left')
 
@@ -54,6 +56,8 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     except pd.errors.EmptyDataError:
         st.write(f"No data to parse in file: {category_tree_file}. Skipping...")
         category_tree_df = pd.DataFrame(columns=["PrimaryCategory", "Category"])
+
+    st.write("Loaded category tree data:", category_tree_df.head())
 
     # Check if 'Category' column exists in category_tree_df
     if 'Category' in category_tree_df.columns:
@@ -97,11 +101,17 @@ if __name__ == "__main__":
     # Specify the directory containing CSV files
     csv_files = glob.glob("Global*.csv")
 
+    st.write("CSV Files:", csv_files)
+
     # Specify the sellers Excel file name
     sellers_file = "sellers.xlsx"
 
+    st.write("Sellers file:", sellers_file)
+
     # Specify the category tree Excel file name
     category_tree_file = "category_tree.xlsx"
+
+    st.write("Category tree file:", category_tree_file)
 
     # Call the function to merge the CSV files, perform VLOOKUP, and update PrimaryCategory
     merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
