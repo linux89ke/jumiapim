@@ -6,17 +6,17 @@ import re
 
 def load_colors_from_txt(file_path):
     with open(file_path, 'r') as file:
-        colors = [line.strip() for line in file.readlines()]
+        colors = {line.strip().lower() for line in file.readlines()}
     return colors
 
 def check_for_color(cell_text, common_colors):
     if pd.isna(cell_text):
         return "No"
-    
-    for color in common_colors:
-        if re.search(re.escape(color), cell_text, flags=re.IGNORECASE):
-            return "Yes"
 
+    cell_text_lower = cell_text.lower()
+    for color in common_colors:
+        if color in cell_text_lower:
+            return "Yes"
     return "No"
 
 def main():
@@ -38,12 +38,12 @@ def main():
             # Check if 'BRAND' column exists in the uploaded file
             if 'BRAND' in df.columns:
                 # Check if any value in 'BRAND' column is 'Generic'
-                if (df['BRAND'] == 'Generic').any():
+                if df['BRAND'].str.lower().eq('generic').any():
                     # Check if 'ID' column exists in the category file
                     if 'ID' in category_fas_df.columns:
                         # Create a new column 'check_Brand' in the output file
                         df['check_Brand'] = df.apply(lambda row:
-                            'No' if row['BRAND'] == 'Generic' and row['CATEGORY_CODE'] in category_fas_df['ID'].values else 'Yes',
+                            'No' if row['BRAND'].lower() == 'generic' and row['CATEGORY_CODE'] in category_fas_df['ID'].values else 'Yes',
                             axis=1
                         )
                     else:
