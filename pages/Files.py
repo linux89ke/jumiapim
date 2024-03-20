@@ -3,7 +3,7 @@ import pandas as pd
 import glob
 from datetime import datetime
 
-def merge_csv_files(output_file, csv_files, category_tree_file):
+def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     # Initialize an empty DataFrame with the additional columns
     result_df = pd.DataFrame(columns=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
 
@@ -37,6 +37,16 @@ def merge_csv_files(output_file, csv_files, category_tree_file):
             print(f"Error details: {e}")
             continue
 
+    # Load the "sellers" Excel file
+    try:
+        sellers_df = pd.read_excel(sellers_file)
+    except pd.errors.EmptyDataError:
+        print(f"No data to parse in file: {sellers_file}. Skipping...")
+        sellers_df = pd.DataFrame(columns=["SellerName", "Seller_ID"])
+
+    # Perform a VLOOKUP to add the "Seller_ID" column based on "SellerName"
+    result_df = result_df.merge(sellers_df[['SellerName', 'Seller_ID']], on='SellerName', how='left')
+
     # Load the "category tree" Excel file
     try:
         category_tree_df = pd.read_excel(category_tree_file)
@@ -62,7 +72,7 @@ def merge_csv_files(output_file, csv_files, category_tree_file):
         print("'Category' column not found in category_tree_df. Skipping update.")
 
     # Rearrange the columns
-    result_df = result_df[["SellerName", "Name", "SellerSku", "PrimaryCategory", "Brand"]]
+    result_df = result_df[["SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"]]
 
     # Generate the current date to include in the output file name
     current_date = datetime.now().strftime("%Y%m%d")
@@ -83,11 +93,14 @@ if __name__ == "__main__":
     # Specify the output file name
     output_file = "Merged_skus_date.csv"
 
-    # Specify the path pattern for the CSV files in the same folder as the script
+    # Specify the directory containing CSV files
     csv_files = glob.glob("Global*.csv")
+
+    # Specify the sellers Excel file name
+    sellers_file = "sellers.xlsx"
 
     # Specify the category tree Excel file name
     category_tree_file = "category_tree.xlsx"
 
-    # Call the function to merge the CSV files and update PrimaryCategory
-    merge_csv_files(output_file, csv_files, category_tree_file)
+    # Call the function to merge the CSV files, perform VLOOKUP, and update PrimaryCategory
+    merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
