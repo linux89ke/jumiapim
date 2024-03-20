@@ -13,7 +13,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
         return
 
     # Initialize an empty DataFrame with the additional columns
-    result_df = pd.DataFrame(columns=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
+    result_df = pd.DataFrame(columns=["SellerName", "Jumia SKU", "Name", "Brand", "PrimaryCategory"])
 
     # Iterate through each CSV file
     for file in csv_files:
@@ -24,7 +24,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
                 continue
 
             # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
-            df = pd.read_csv(file, delimiter=';', usecols=["PrimaryCategory", "SellerName", "SellerSku", "Brand", "Name"])
+            df = pd.read_csv(file, usecols=["SellerName", "Jumia SKU", "Name", "Brand", "PrimaryCategory"])
 
             # Check if the DataFrame has any data before processing
             if not df.empty:
@@ -81,7 +81,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
         st.write("'Category' column not found in category_tree_df. Skipping update.")
 
     # Rearrange the columns
-    result_df = result_df[["SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"]]
+    result_df = result_df[["SellerName", "Jumia SKU", "Name", "Brand", "PrimaryCategory"]]
 
     # Generate the current date to include in the output file name
     current_date = datetime.now().strftime("%Y%m%d")
@@ -100,12 +100,6 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     st.write("Merged file saved successfully.")
 
 # Streamlit UI
-st.title("CSV File Merger")
+st.title("CSV
 
-output_file = st.text_input("Enter output file name:", "Merged_skus_date.csv")
-sellers_file = st.file_uploader("Upload sellers Excel file:")
-category_tree_file = "category_tree.xlsx"  # Fixed file path
-
-csv_files = st.file_uploader("Upload CSV files:", accept_multiple_files=True)
-if st.button("Merge CSV Files"):
-    merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
+         
