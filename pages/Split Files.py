@@ -21,9 +21,9 @@ def split_and_save_excel(input_file, chunk_size=9998):
         st.error("Error reading Excel file. Please make sure it's a valid Excel file.")
         return [], 0
 
-    # Read the data from the 'reject reasons.xlsx' file
-    reject_reasons_file_path = os.path.join(os.path.dirname(__file__), "reject reasons.xlsx")
-    reject_reasons_df = pd.read_excel(reject_reasons_file_path)
+    # Get the directory of the current script
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    reject_reasons_file_path = os.path.join(script_directory, "reject reasons.xlsx")
 
     # Check if the required sheet "ProductSets" is present
     if "ProductSets" not in excel_file.sheet_names:
@@ -32,6 +32,13 @@ def split_and_save_excel(input_file, chunk_size=9998):
     else:
         # Read the ProductSets sheet
         product_sets_df = excel_file.parse("ProductSets")
+
+    # Read the data from the 'reject reasons.xlsx' file
+    if os.path.exists(reject_reasons_file_path):
+        reject_reasons_df = pd.read_excel(reject_reasons_file_path)
+    else:
+        st.error("The 'reject reasons.xlsx' file does not exist.")
+        return [], 0
 
     # Get total number of rows in the input file
     total_rows = 0
