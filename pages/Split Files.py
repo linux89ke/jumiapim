@@ -19,23 +19,14 @@ def split_and_save_excel(input_file, max_rows=9800):
     output_files = []
 
     for sheet_name in excel_file.sheet_names:
-        # Skip RejectionReasons sheet
-        if sheet_name == 'RejectionReasons':
-            continue
-
         df = excel_file.parse(sheet_name)
         df_chunks = [df[i:i+max_rows] for i in range(0, len(df), max_rows)]
 
         for i, chunk in enumerate(df_chunks):
             output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
-            chunk.to_excel(output_file_name, index=False)
+            with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
+                chunk.to_excel(writer, sheet_name=sheet_name, index=False)
             output_files.append(output_file_name)
-
-    # Save RejectionReasons sheet
-    rejection_reasons_sheet = excel_file.parse('RejectionReasons')
-    rejection_reasons_output_file = f"KE_PIM_{current_date}_RejectionReasons.xlsx"
-    rejection_reasons_sheet.to_excel(rejection_reasons_output_file, index=False)
-    output_files.append(rejection_reasons_output_file)
 
     logging.info(f"Saved {len(output_files)} files.")
     return output_files
