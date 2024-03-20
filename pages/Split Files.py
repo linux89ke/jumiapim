@@ -30,31 +30,33 @@ def split_and_save_excel(input_file, chunk_size=9998):
     current_date = datetime.now().strftime("%Y-%m-%d")
     output_files = []
 
-    # Progress bar
-    progress_bar = st.progress(0)
+    if st.button("Split Files"):
+        # Progress bar
+        progress_bar = st.progress(0)
 
-    progress_value = 0
-    progress_increment = 100 / total_rows
+        progress_value = 0
+        progress_increment = 100 / total_rows
 
-    for sheet_name in excel_file.sheet_names:
-        if sheet_name == 'RejectionReasons':
-            continue
-        
-        df = excel_file.parse(sheet_name)
-        df_chunks = [df[i:i+chunk_size] for i in range(0, len(df), chunk_size)]
+        for sheet_name in excel_file.sheet_names:
+            if sheet_name == 'RejectionReasons':
+                continue
+            
+            df = excel_file.parse(sheet_name)
+            df_chunks = [df[i:i+chunk_size] for i in range(0, len(df), chunk_size)]
 
-        for i, chunk in enumerate(df_chunks):
-            output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
-            with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
-                chunk.to_excel(writer, sheet_name=sheet_name, index=False)
-                excel_file.parse('RejectionReasons').to_excel(writer, sheet_name='RejectionReasons', index=False)
-            output_files.append(output_file_name)
+            for i, chunk in enumerate(df_chunks):
+                output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
+                with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
+                    chunk.to_excel(writer, sheet_name=sheet_name, index=False)
+                    excel_file.parse('RejectionReasons').to_excel(writer, sheet_name='RejectionReasons', index=False)
+                output_files.append(output_file_name)
 
-            # Update progress bar
-            progress_value += progress_increment
-            progress_bar.progress(progress_value)
+                # Update progress bar
+                progress_value += progress_increment
+                progress_bar.progress(progress_value)
 
-    logging.info(f"Saved {len(output_files)} files.")
+        logging.info(f"Saved {len(output_files)} files.")
+
     return output_files, total_rows
 
 # Set up logging configuration
@@ -85,7 +87,7 @@ if uploaded_file is not None:
                     for file in output_files:
                         zipf.write(file)
                 with open(zip_file_name, "rb") as f:
-                    st.download_button(label="Download", data=f, file_name=zip_file_name)
+                    st.download_button(label="Download Zip", data=f, file_name=zip_file_name)
                 os.remove(zip_file_name)
     else:
         st.error("No valid output files were generated.")
