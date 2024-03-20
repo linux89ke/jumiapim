@@ -83,7 +83,14 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     st.success(f"Merge completed. Merged data saved to {output_file}")
 
     # Provide a download link for the merged result
-    st.markdown(f"### [Download Merged Data]({output_file})")
+    st.markdown(get_binary_file_downloader_html(output_file), unsafe_allow_html=True)
+
+def get_binary_file_downloader_html(bin_file, file_label='Download CSV'):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    bin_str = base64.b64encode(data).decode()
+    href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{bin_file}" target="_blank">{file_label}</a>'
+    return href
 
 if __name__ == "__main__":
     # Specify the output file name
