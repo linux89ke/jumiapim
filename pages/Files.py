@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
 
 def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
@@ -12,25 +11,12 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
         return
 
     result_df = pd.DataFrame(columns=[
-        "SellerName", "Jumia SKU", "Name", "Brand", "Model", "Color", "PrimaryCategory", 
-        "Categories", "BrowseNodes", "TaxClass", "ColorFamily", "MainMaterial", "ProductMeasures",
-        "ProductWeight", "Description", "ShortDescription", "PackageContent", "CareLabel", 
-        "YoutubeId", "AirCoolerType", "WashingMachineType", "VentingType", "Variation", 
-        "StoveType", "JuicerType", "InstallationType", "FridgeType", "FreezerType", "FanType", 
-        "DefrostType", "CookerType", "BlenderType", "ShopType", "ProductionCountry", 
-        "ShelfLifeManaged", "MinimumShelfLife", "SaleStartDate", "SalePrice", "SaleEndDate", 
-        "ProductWarranty", "ProductId", "Price", "SellerSku", "ParentSku", "Quantity", 
-        "CreatedAt", "UpdatedAt", "ProductGroup", "Status"
+        "SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"
     ])
 
     for file in csv_files:
         try:
-            if pd.read_csv(file, nrows=1).empty:
-                st.write(f"Skipping empty CSV file: {file.name}")
-                continue
-
             df = pd.read_csv(file)
-
             if not df.empty:
                 result_df = pd.concat([result_df, df])
             else:
@@ -68,28 +54,12 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     else:
         st.write("'Category' column not found in category_tree_df. Skipping update.")
 
-    result_df = result_df[[
-        "SellerName", "Jumia SKU", "Name", "Brand", "Model", "Color", "PrimaryCategory", 
-        "Categories", "BrowseNodes", "TaxClass", "ColorFamily", "MainMaterial", "ProductMeasures",
-        "ProductWeight", "Description", "ShortDescription", "PackageContent", "CareLabel", 
-        "YoutubeId", "AirCoolerType", "WashingMachineType", "VentingType", "Variation", 
-        "StoveType", "JuicerType", "InstallationType", "FridgeType", "FreezerType", "FanType", 
-        "DefrostType", "CookerType", "BlenderType", "ShopType", "ProductionCountry", 
-        "ShelfLifeManaged", "MinimumShelfLife", "SaleStartDate", "SalePrice", "SaleEndDate", 
-        "ProductWarranty", "ProductId", "Price", "SellerSku", "ParentSku", "Quantity", 
-        "CreatedAt", "UpdatedAt", "ProductGroup", "Status"
-    ]]
+    result_df = result_df[["SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"]]
 
     current_date = datetime.now().strftime("%Y%m%d")
+    output_file_name = f"Merged_skus_{current_date}.csv"
 
-    if os.path.isfile(output_file):
-        letter = 'A'
-        while os.path.isfile(f"Merged_skus_{current_date}_{letter}.csv"):
-            letter = chr(ord(letter) + 1)
-
-        output_file = f"Merged_skus_{current_date}_{letter}.csv"
-
-    result_df.to_csv(output_file, index=False)
+    result_df.to_csv(output_file_name, index=False)
     st.write("Merged file saved successfully.")
 
 # Streamlit UI
@@ -97,8 +67,8 @@ st.title("CSV File Merger")
 
 output_file = st.text_input("Enter output file name:", "Merged_skus_date.csv")
 sellers_file = st.file_uploader("Upload sellers Excel file:")
-category_tree_file = "category_tree.xlsx"
-
+category_tree_file = st.file_uploader("Upload category tree Excel file:")
 csv_files = st.file_uploader("Upload CSV files:", accept_multiple_files=True)
+
 if st.button("Merge CSV Files"):
     merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
