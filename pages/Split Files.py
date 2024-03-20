@@ -22,7 +22,8 @@ def split_and_save_excel(input_file, max_rows=9800):
         if sheet_name == 'RejectionReasons':
             continue
 
-        df_chunks = pd.read_excel(excel_file, sheet_name, chunksize=max_rows)
+        df = pd.read_excel(excel_file, sheet_name)
+        df_chunks = [df[i:i+max_rows] for i in range(0, len(df), max_rows)]
 
         for i, chunk in enumerate(df_chunks):
             output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
