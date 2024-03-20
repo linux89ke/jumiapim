@@ -77,7 +77,7 @@ def main():
 
             # Next button for navigation to Pivot_table.py
             if st.button("Next"):
-                st.markdown("<iframe src='http://localhost:8501/Pivot_table.py' width='1200' height='800'></iframe>", unsafe_allow_html=True)
+                st.markdown("<iframe src='https://jumiapim.streamlit.app/Pivot_table' width='1200' height='800'></iframe>", unsafe_allow_html=True)
 
         except Exception as e:
             st.error(f"Error: {e}")
