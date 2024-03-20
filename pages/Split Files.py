@@ -5,6 +5,11 @@ import string
 import logging
 import zipfile
 import os
+import math
+
+# Function to estimate the number of output files
+def estimate_output_files(total_rows, chunk_size):
+    return math.ceil(total_rows / chunk_size)
 
 # Function to split and save Excel file
 def split_and_save_excel(input_file, chunk_size=9998):
@@ -23,6 +28,10 @@ def split_and_save_excel(input_file, chunk_size=9998):
 
     # Display total number of rows
     st.write(f"Total number of rows in input file: {total_rows}")
+
+    # Estimate number of output files based on chunk size
+    est_output_files = estimate_output_files(total_rows, chunk_size)
+    st.write(f"Estimated number of output files: {est_output_files}")
 
     # Slider for choosing chunk size
     chunk_size = st.slider("Choose number of rows per chunk", min_value=6500, max_value=9998, value=chunk_size)
