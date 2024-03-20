@@ -41,6 +41,10 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
             st.write(f"Error reading file: {file.name}. Skipping...")
             st.write(f"Error details: {e}")
             continue
+        except ValueError as e:
+            st.write(f"Error reading file: {file.name}. Skipping...")
+            st.write(f"Error details: {e}")
+            continue
 
     # Load the "sellers" Excel file
     try:
@@ -101,6 +105,7 @@ st.title("CSV File Merger")
 output_file = st.text_input("Enter output file name:", "Merged_skus_date.csv")
 sellers_file = st.file_uploader("Upload sellers Excel file:")
 category_tree_file = "category_tree.xlsx"  # Fixed file path
+
 csv_files = st.file_uploader("Upload CSV files:", accept_multiple_files=True)
 if st.button("Merge CSV Files"):
     merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
