@@ -9,7 +9,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
         st.write("No CSV files uploaded. Please upload CSV files.")
         return
 
-    result_df = pd.DataFrame(columns=["SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"])
+    result_df = pd.DataFrame(columns=["SellerName", "Name", "SellerSku", "PrimaryCategory", "Brand"])
 
     for file in csv_files:
         try:
@@ -41,11 +41,12 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     if sellers_file is not None:
         try:
             sellers_df = pd.read_excel(sellers_file)
-            result_df = result_df.merge(sellers_df[['SellerName', 'Seller_ID']], on='SellerName', how='left')
+            if 'SellerName' in sellers_df.columns and 'Seller_ID' in sellers_df.columns:
+                result_df = result_df.merge(sellers_df[['SellerName', 'Seller_ID']], on='SellerName', how='left')
+            else:
+                st.write("Unable to merge sellers data. Ensure 'SellerName' and 'Seller_ID' columns exist in sellers file.")
         except pd.errors.EmptyDataError:
             st.write(f"No data to parse in file: {sellers_file.name}. Skipping...")
-        except KeyError:
-            st.write("Unable to merge sellers data. Ensure 'SellerName' and 'Seller_ID' columns exist in sellers file.")
 
     if category_tree_file is not None:
         try:
@@ -64,7 +65,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
             letter = chr(ord(letter) + 1)
         output_file = f"Merged_skus_{current_date}_{letter}.csv"
 
-    result_df = result_df[["SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"]]
+    result_df = result_df[["SellerName", "Name", "SellerSku", "PrimaryCategory", "Brand"]]
 
     result_df.to_csv(output_file, index=False)
     st.write("Merged file saved successfully.")
