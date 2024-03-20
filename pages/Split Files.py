@@ -23,15 +23,15 @@ def split_and_save_excel(input_file, chunk_size=9998):
 
     # Get the directory of the current script
     script_directory = os.path.dirname(os.path.abspath(__file__))
-    reject_reasons_file_path = os.path.join(script_directory, "reject reasons.xlsx")
+    reasons_file_path = os.path.join(script_directory, "reasons.xlsx")
 
-    # Check if the 'reject reasons.xlsx' file exists
-    if not os.path.exists(reject_reasons_file_path):
-        st.error("The 'reject reasons.xlsx' file does not exist.")
+    # Check if the 'reasons.xlsx' file exists
+    if not os.path.exists(reasons_file_path):
+        st.error("The 'reasons.xlsx' file does not exist.")
         return [], 0
 
-    # Read the data from the 'reject reasons.xlsx' file
-    reject_reasons_df = pd.read_excel(reject_reasons_file_path)
+    # Read the data from the 'reasons.xlsx' file
+    reasons_df = pd.read_excel(reasons_file_path)
 
     # Check if the required sheet "ProductSets" is present
     if "ProductSets" not in excel_file.sheet_names:
@@ -79,7 +79,7 @@ def split_and_save_excel(input_file, chunk_size=9998):
                 with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
                     chunk.to_excel(writer, sheet_name='ProductSets', index=False)
                     product_sets_df.to_excel(writer, sheet_name='ProductSets', index=False)
-                    reject_reasons_df.to_excel(writer, sheet_name='RejectionReasons', index=False)
+                    reasons_df.to_excel(writer, sheet_name='RejectionReasons', index=False)
                 output_files.append(output_file_name)
 
                 # Update progress bar
