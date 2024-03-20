@@ -22,7 +22,7 @@ st.markdown("This is my work app")
 # Description
 st.write("""
 ## About This App
-This app is designed to [briefly describe the purpose of your app]. It provides [list some key features or functionalities]. 
+This app is designed to make work easier 
 
 Feel free to explore and interact with the different components!
 """)
