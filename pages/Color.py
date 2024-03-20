@@ -1,8 +1,5 @@
-import pandas as pd
-import os
-from datetime import datetime
 import streamlit as st
-import re
+from streamlit.components.v1 import components
 
 def load_colors_from_txt(file_path):
     with open(file_path, 'r') as file:
@@ -75,6 +72,10 @@ def main():
                 file_name=output_file_name,
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
+
+            # Next button for navigation to Pivot_table.py
+            if st.button("Next"):
+                components.iframe("http://localhost:8501/Pivot_table.py", width=1200, height=800)
 
         except Exception as e:
             st.error(f"Error: {e}")
