@@ -115,10 +115,10 @@ def process_files(input_file):
     st.write(final_df)
     
     # Define the base output file name for PIM file
-    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.csv'
+    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.xlsx'
     counter = 1
     while os.path.exists(os.path.join(output_folder, pim_output_file)):
-        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.csv'
+        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.xlsx'
         counter += 1
     
     # Create the PIM DataFrame
@@ -128,47 +128,4 @@ def process_files(input_file):
     # Apply mapping for 'reason' to generate 'Status' and 'Reason' columns
     pim_df['Status'] = df['reason'].apply(lambda x: 'Approved' if pd.isna(x) or x == '' else 'Rejected')
     pim_df['Reason'] = df['reason'].map(reason_mapping).fillna('Approved')  # Fill blank reasons with 'Approved'
-    pim_df.loc[pim_df['Status'] == 'Approved', ['Reason', 'Comment']] = ''
-    
-    # Apply specific mappings for certain reasons
-    pim_df.loc[pim_df['Reason'] == 'Wrong Brand', 'Comment'] = 'Please use Fashion as brand name'
-    
-    # Sort PIM DataFrame by 'Status'
-    pim_df.sort_values(by='Status', ascending=False, inplace=True)
-    
-    # Save the PIM DataFrame to a CSV file
-    pim_output_path = os.path.join(output_folder, pim_output_file)
-    pim_df.to_csv(pim_output_path, index=False, encoding='utf-8-sig')  # Specify encoding as utf-8-sig to preserve non-English characters
-    
-    # Display success message with downloadable link for PIM file
-    st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
-    
-    return True  # Return True to indicate processing is completed
-
-# Function to generate HTML download link
-def get_download_link(file_path, link_text):
-    with open(file_path, "rb") as f:
-        file_bytes = f.read()
-    b64 = base64.b64encode(file_bytes).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="{os.path.basename(file_path)}">{link_text}</a>'
-
-# Streamlit app
-def main():
-    st.title("Excel Data Processing App")
-    st.write("This app processes Excel/CSV data and generates Pivot and PIM files.")
-    
-    # File uploader
-    uploaded_file = st.file_uploader("Upload an Excel/CSV file", type=["xls", "xlsx", "csv"])
-    
-    if uploaded_file is not None:
-        # Display file details
-        st.write("Uploaded file details:")
-        file_details = {"File Name": uploaded_file.name, "File Type": uploaded_file.type, "File Size": uploaded_file.size}
-        st.write(file_details)
-        
-        # Process the uploaded file
-        if process_files(uploaded_file):
-            st.stop()  # Stop the Streamlit app execution
-
-if __name__ == "__main__":
-    main()
+    pim_df.loc[pim_df['
