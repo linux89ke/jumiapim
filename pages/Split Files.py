@@ -21,9 +21,11 @@ def split_and_save_excel(input_file, chunk_size=9998):
         st.error("Error reading Excel file. Please make sure it's a valid Excel file.")
         return [], 0
 
-    # Get the directory of the current script
-    script_directory = os.path.dirname(os.path.abspath(__file__))
-    reasons_file_path = os.path.join(script_directory, "reasons.xlsx")
+    # Get the directory of the uploaded file
+    uploaded_file_directory = os.path.dirname(os.path.abspath(input_file.name))
+
+    # Get the path to the 'reasons.xlsx' file in the same directory as the uploaded file
+    reasons_file_path = os.path.join(uploaded_file_directory, "reasons.xlsx")
 
     # Check if the 'reasons.xlsx' file exists
     if not os.path.exists(reasons_file_path):
