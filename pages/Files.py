@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from datetime import datetime
 import streamlit as st
+import base64
 
 def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     # Initialize an empty DataFrame with the additional columns
@@ -98,7 +99,13 @@ if __name__ == "__main__":
 
     # File uploader for CSV files
     st.title("Merge CSV Files")
-    csv_files = st.file_uploader("Upload CSV files", type="csv", accept_multiple_files=True)
+    csv_files = st.file_uploader("Upload CSV files", type="csv", accept
+   if csv_files:
+        # Specify the sellers Excel file name
+        sellers_file = "sellers.xlsx"
 
-    if csv_files:
-        merge_csv_files(output_file, csv_files, "sellers.xlsx", "category_tree.xlsx")
+        # Specify the category tree Excel file name
+        category_tree_file = "category_tree.xlsx"
+
+        # Call the function to merge the CSV files, perform VLOOKUP, and update PrimaryCategory
+        merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
