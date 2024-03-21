@@ -9,7 +9,7 @@ def concatenate_csv_files(files):
     # Identify common columns among all files
     for file in files:
         try:
-            df = pd.read_csv(file, sep=';', nrows=1, encoding='utf-8-sig')
+            df = pd.read_csv(file, nrows=1, encoding='utf-8-sig')
             if common_columns is None:
                 common_columns = set(df.columns)
             else:
@@ -21,7 +21,7 @@ def concatenate_csv_files(files):
         # Read files while specifying only common columns
         for file in files:
             try:
-                df = pd.read_csv(file, sep=';', usecols=common_columns, encoding='utf-8-sig')
+                df = pd.read_csv(file, usecols=common_columns, encoding='utf-8-sig')
                 df_list.append(df)
             except Exception as e:
                 st.warning(f"Could not read file {file.name} because of error: {e}")
@@ -52,7 +52,7 @@ def main():
             st.write(combined_df)
 
             # Download combined DataFrame as CSV
-            csv_data = combined_df.to_csv(index=False, sep=';', encoding='utf-8-sig')
+            csv_data = combined_df.to_csv(index=False, encoding='utf-8-sig')
             st.download_button(label="Download Combined CSV", data=csv_data, file_name="combined_file.csv", mime="text/csv")
         else:
             st.error("No valid CSV files uploaded.")
