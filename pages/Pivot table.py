@@ -20,7 +20,7 @@ def process_files(input_file):
     
     # Read the file into a DataFrame (handle both Excel and CSV files)
     if input_file.name.endswith('.xlsx') or input_file.name.endswith('.xls'):
-        df = pd.read_excel(input_file, engine='xlrd')  # Modified line
+        df = pd.read_excel(input_file, engine='openpyxl')
     elif input_file.name.endswith('.csv'):
         try:
             df = pd.read_csv(input_file, encoding='utf-8')
@@ -31,7 +31,6 @@ def process_files(input_file):
         st.error("Unsupported file format. Please upload an Excel (.xls, .xlsx) or CSV file.")
         return False
     
- 
     # Specify the column names
     seller_name_col = 'SELLER_NAME'
     category_col = 'CATEGORY'
@@ -50,9 +49,6 @@ def process_files(input_file):
         'bra': 'Wrong Brand',
         'Wrong Variation - means size only': 'Wrong Variation - means size only'
     }
-    
-    # Update the reason mapping as per your requirement
-    reason_mapping.update({'col': 'Wrong Color'})
     
     # Create a pivot table without totals
     pivot_table = pd.pivot_table(df,
@@ -100,7 +96,7 @@ def process_files(input_file):
     # Add a blank column after 'rej'
     final_df.insert(final_df.columns.get_loc('rej') + 3, 'Blank_Column', '')
     
-    # Reorder the columns, placing 'reason' at the end
+    # Reorder the columns,
     final_df = final_df[['Week_Number', 'Formatted_Date', 'SELLER_NAME', 'CATEGORY', 'app', 'rej', 'Blank_Column', 'new_col_1', 'new_col_2', 'reason']]
     
     # Save the Pivot DataFrame to a CSV file
@@ -110,7 +106,7 @@ def process_files(input_file):
     # Display success message with downloadable link for Pivot file
     st.markdown(get_download_link(pivot_output_path, "Download Pivot File"), unsafe_allow_html=True)
     
-    # Display the data from the Pivot file
+    # Display the data
     st.subheader("Data from Pivot File")
     st.write(final_df)
     
@@ -128,30 +124,26 @@ def process_files(input_file):
     # Apply mapping for 'reason' to generate 'Status' and 'Reason' columns
     pim_df['Status'] = df['reason'].apply(lambda x: 'Approved' if pd.isna(x) or x == '' else 'Rejected')
     pim_df['Reason'] = df['reason'].map(reason_mapping).fillna('Approved')  # Fill blank reasons with 'Approved'
-    pim_df.loc[pim_df['Status'] == 'Approved',
-['Reason', 'Comment']] = ''
-    
-    # Apply specific mappings for certain reasons
-    pim_df.loc[pim_df['Reason'] == 'Wrong Brand', 'Comment'] = 'Please use Fashion as brand name'
-    
-    # Sort PIM DataFrame by 'Status'
-    pim_df.sort_values(by='Status', ascending=False, inplace=True)
+    pim_df['Timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Add timestamp column
     
     # Save the PIM DataFrame to an Excel file
     pim_output_path = os.path.join(output_folder, pim_output_file)
-    pim_df.to_excel(pim_output_path, index=False)  # Save as Excel file without index
+    pim_df.to_excel(pim_output_path, index=False, encoding='utf-8-sig')
     
     # Display success message with downloadable link for PIM file
     st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
     
-    return True  # Return True to indicate processing is completed
+    # Display the data from the PIM file
+    st.subheader("Data from PIM File")
+    st.write(pim_df)
 
-# Function to generate HTML download link
-def get_download_link(file_path, link_text):
-    with open(file_path, "rb") as f:
-        file_bytes = f.read()
-    b64 = base64.b64encode(file_bytes).decode()
-    return f'<a href="data:file/xlsx;base64,{b64}" download="{os.path.basename(file_path)}">{link_text}</a>'
+# Function to create a download link for a file
+def get_download_link(file_path, text):
+    with open(file_path, 'rb') as file:
+        contents = file.read()
+    encoded = base64.b64encode(contents).decode()
+    href = f'<a href="data:file/csv;base64,{encoded}" download="{os.path.basename(file_path)}">{text}</a>'
+    return href
 
 # Streamlit app
 def main():
