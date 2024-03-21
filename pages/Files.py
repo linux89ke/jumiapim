@@ -1,30 +1,20 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
 import os
-import glob
+from datetime import datetime
 
-# Function to merge CSV files, perform VLOOKUP, and update PrimaryCategory
-def merge_csv_files(output_file, sellers_df, category_tree_df, csv_files):
+def merge_csv_files(output_file, sellers_df, category_tree_df, uploaded_files):
     # Initialize an empty DataFrame with the additional columns
     result_df = pd.DataFrame(columns=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
 
-    # Iterate through each CSV file
-    for file in csv_files:
+    # Iterate through each uploaded CSV file
+    for file in uploaded_files:
         try:
-            # Read the CSV file into a DataFrame, specifying the delimiter
-            df = pd.read_csv(file, delimiter=';')
+            # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
+            df = pd.read_csv(file, delimiter=';', usecols=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
 
-            # Check if the DataFrame has any data before processing
-            if not df.empty:
-                # Extract necessary columns
-                df = df[["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"]]
-
-                # Concatenate the selected columns to the result DataFrame
-                result_df = pd.concat([result_df, df])
-
-            else:
-                print(f"Empty DataFrame in file: {file}. Skipping...")
+            # Concatenate the selected columns to the result DataFrame
+            result_df = pd.concat([result_df, df])
 
         except pd.errors.EmptyDataError:
             print(f"No data to parse in file: {file}. Skipping...")
@@ -37,16 +27,13 @@ def merge_csv_files(output_file, sellers_df, category_tree_df, csv_files):
     # Perform a VLOOKUP to add the "Seller_ID" column based on "SellerName"
     result_df = result_df.merge(sellers_df[['SellerName', 'Seller_ID']], on='SellerName', how='left')
 
-    # Check if 'Category' column exists in category_tree_df
+    # Perform a VLOOKUP to update PrimaryCategory
     if 'Category' in category_tree_df.columns:
-        # Perform a VLOOKUP to replace "PrimaryCategory" values with corresponding values from "Category" column
         result_df = pd.merge(result_df, category_tree_df[['PrimaryCategory', 'Category']], left_on='PrimaryCategory', right_on='PrimaryCategory', how='left')
-
-        # Fill NaN values in 'PrimaryCategory' with values from 'Category'
         result_df['PrimaryCategory'] = result_df['Category'].combine_first(result_df['PrimaryCategory'])
-
-        # Drop redundant columns
         result_df = result_df.drop(columns=['Category'])
+    else:
+        print("'Category' column not found in category_tree_df. Skipping update.")
 
     # Rearrange the columns
     result_df = result_df[["SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"]]
@@ -54,40 +41,44 @@ def merge_csv_files(output_file, sellers_df, category_tree_df, csv_files):
     # Generate the current date to include in the output file name
     current_date = datetime.now().strftime("%Y%m%d")
 
+    # Check if the output file already exists
+    if os.path.isfile(output_file):
+        # Find a unique filename by appending a letter
+        letter = 'A'
+        while os.path.isfile(f"Merged_skus_{current_date}_{letter}.csv"):
+            letter = chr(ord(letter) + 1)
+
+        output_file = f"Merged_skus_{current_date}_{letter}.csv"
+
     # Write the merged DataFrame to the new CSV file
     result_df.to_csv(output_file, index=False)
-
     return output_file
 
-# Streamlit app
 def main():
+    # Title and file upload
     st.title("CSV File Merger")
+    st.write("Upload CSV files to merge")
 
-    # Upload CSV files
-    uploaded_files = st.file_uploader("Upload CSV files", type=["csv"], accept_multiple_files=True)
+    uploaded_files = st.file_uploader("Choose CSV files to upload", type="csv", accept_multiple_files=True)
 
     if uploaded_files:
+        # Display the uploaded file names
         st.write("Uploaded files:")
         for file in uploaded_files:
             st.write(file.name)
 
-        # Upload Sellers Excel file
-        sellers_file = st.file_uploader("Upload Sellers Excel file", type=["xlsx"])
+        # Specify the output file name
+        output_file = "Merged_skus_date.csv"
 
-        # Upload Category Tree Excel file
-        category_tree_file = st.file_uploader("Upload Category Tree Excel file", type=["xlsx"])
+        # Load the "sellers" Excel file
+        sellers_df = pd.read_excel("sellers.xlsx")
 
-        if sellers_file is not None and category_tree_file is not None:
-            sellers_df = pd.read_excel(sellers_file)
-            category_tree_df = pd.read_excel(category_tree_file)
-            output_file = "Merged_skus_date.csv"
+        # Load the "category tree" Excel file
+        category_tree_df = pd.read_excel("category_tree.xlsx")
 
-            # Call the function to merge the CSV files, perform VLOOKUP, and update PrimaryCategory
-            result_file = merge_csv_files(output_file, sellers_df, category_tree_df, uploaded_files)
-
-            st.success("Files successfully merged!")
-            st.write("Download the merged CSV file:")
-            st.download_button(label="Download Merged CSV", data=result_file, file_name=result_file, mime="text/csv")
+        # Call the function to merge the CSV files, perform VLOOKUP, and update PrimaryCategory
+        result_file = merge_csv_files(output_file, sellers_df, category_tree_df, uploaded_files)
+        st.success(f"Result file saved as: {result_file}")
 
 if __name__ == "__main__":
     main()
