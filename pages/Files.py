@@ -80,5 +80,13 @@ def main():
         result_file = merge_csv_files(output_file, sellers_df, category_tree_df, uploaded_files)
         st.success(f"Result file saved as: {result_file}")
 
+        # Add a download button for the result file
+        st.download_button(
+            label="Download merged file",
+            data=result_file,
+            file_name=result_file,
+            mime="text/csv"
+        )
+
 if __name__ == "__main__":
     main()
