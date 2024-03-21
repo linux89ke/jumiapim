@@ -46,7 +46,8 @@ def process_files(input_file):
         'col': '1000005 - Kindly confirm the actual product colour',
         'cat': '1000004 - Wrong Category',
         'var': '1000004 - 1000038 - Kindly Ensure ALL Sizes Of This Product Are Created As Variants Under This Product & Not Created As Unique Products',
-        'bra': 'Wrong Brand',
+        'bra': '1000007 - Other Reason',
+        
     }
     
     # Create a pivot table without totals
@@ -92,39 +93,33 @@ def process_files(input_file):
     final_df.insert(final_df.columns.get_loc('rej') + 1, 'new_col_1', 'KE')
     final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', 'Charles')
     
-    # Add a blank column after 'rej'
+     # Add a blank column after 'rej'
     final_df.insert(final_df.columns.get_loc('rej') + 3, 'Blank_Column', '')
     
     # Reorder the columns,
     final_df = final_df[['Week_Number', 'Formatted_Date', 'SELLER_NAME', 'CATEGORY', 'app', 'rej', 'Blank_Column', 'new_col_1', 'new_col_2', 'reason']]
     
-    # Save the Pivot DataFrame to a CSV file
-    pivot_output_path = os.path.join(output_folder, pivot_output_file)
-    final_df.to_csv(pivot_output_path, index=False, encoding='utf-8-sig')  # Specify encoding as utf-8-sig to preserve non-English characters
-    
-    # Display success message with downloadable link for Pivot file
-    st.markdown(get_download_link(pivot_output_path, "Download Pivot File"), unsafe_allow_html=True)
-    
-    # Display the data
-    st.subheader("Data from Pivot File")
-    st.write(final_df)
-    
-    # Define the base output file name for PIM file
-    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.xlsx'
-    counter = 1
-    while os.path.exists(os.path.join(output_folder, pim_output_file)):
-        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.xlsx'
-        counter += 1
-    
-    # Create the PIM DataFrame
+    # Modify PIM DataFrame creation to handle additional requirements
     pim_df = df[['PRODUCT_SET_SID', 'PARENTSKU']].copy()  # Use the correct column names from the input file
     pim_df.columns = ['ProductSetSid', 'ParentSKU']  # Rename columns for consistency
 
     # Apply mapping for 'reason' to generate 'Status' and 'Reason' columns
     pim_df['Status'] = df['reason'].apply(lambda x: 'Approved' if pd.isna(x) or x == '' else 'Rejected')
     pim_df['Reason'] = df['reason'].map(reason_mapping).fillna('Approved')  # Fill blank reasons with 'Approved'
+    
+    # Add Comment column
+    pim_df['Comment'] = df['reason'].apply(lambda x: 'Please Use Fashion as brand name for Fashion items' if x == 'bra' else '')
 
+    # Modify Reason column based on Status
+    pim_df.loc[pim_df['Status'] == 'Approved', 'Reason'] = ''
+    
     # Save the PIM DataFrame to an Excel file
+    pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.xlsx'
+    counter = 1
+    while os.path.exists(os.path.join(output_folder, pim_output_file)):
+        pim_output_file = f'PIM_Date_Time_{datetime.now().strftime("%Y-%m-%d_%H-%M")}_{counter}.xlsx'
+        counter += 1
+    
     pim_output_path = os.path.join(output_folder, pim_output_file)
     pim_df.to_excel(pim_output_path, index=False) 
 
@@ -133,7 +128,7 @@ def process_files(input_file):
     
     # Display the data from the PIM file
     st.subheader("Data from PIM File")
-    st.write(pim_df)
+    st.write(pim_df)   # Add a blank
 
 # Function to create a download link for a file
 def get_download_link(file_path, text):
