@@ -38,10 +38,6 @@ def main():
     # Allow user to add CSV files
     uploaded_files = st.file_uploader("Upload CSV files to merge", accept_multiple_files=True)
 
-    # Allow user to add or remove files
-    add_file_button = st.button("Add File")
-    remove_file_button = st.button("Remove File")
-
     if uploaded_files:
         # Merge the uploaded CSV files
         merged_df = merge_csv_files(uploaded_files)
@@ -62,12 +58,6 @@ def main():
             with open(output_file, "rb") as file:
                 file_content = file.read()
             st.download_button(label="Download", data=file_content, file_name=output_file)
-
-    if add_file_button:
-        st.write("Add file logic goes here")
-
-    if remove_file_button:
-        st.write("Remove file logic goes here")
 
 if __name__ == "__main__":
     main()
