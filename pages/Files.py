@@ -2,7 +2,15 @@ import streamlit as st
 import pandas as pd
 
 def merge_csv_files(output_file, uploaded_files):
-    merged_df = pd.concat([pd.read_csv(file)[["SellerName", "Name", "Brand", "PrimaryCategory"]] for file in uploaded_files], ignore_index=True)
+    important_columns = ["SellerName", "Name", "Brand", "PrimaryCategory"]
+    dataframes = []
+    
+    for file in uploaded_files:
+        df = pd.read_csv(file)
+        df = df[important_columns]  # Select only the important columns
+        dataframes.append(df)
+    
+    merged_df = pd.concat(dataframes, ignore_index=True)
     return merged_df
 
 def add_seller_id(merged_df):
