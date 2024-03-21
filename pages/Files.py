@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
+import os
 import glob
 
 # Function to merge CSV files, perform VLOOKUP, and update PrimaryCategory
@@ -12,19 +12,14 @@ def merge_csv_files(output_file, sellers_df, category_tree_df, csv_files):
     # Iterate through each CSV file
     for file in csv_files:
         try:
-            # Check if the file is not empty and has a valid CSV file extension
-            if pd.read_csv(file, nrows=1).empty:
-                print(f"Skipping empty CSV file: {file}")
-                continue
-
-            # Print the column names of the current CSV file
-            print(f"Columns in file {file}: {pd.read_csv(file, nrows=0).columns}")
-
-            # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
-            df = pd.read_csv(file, delimiter=';', usecols=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
+            # Read the CSV file into a DataFrame, specifying the delimiter
+            df = pd.read_csv(file, delimiter=';')
 
             # Check if the DataFrame has any data before processing
             if not df.empty:
+                # Extract necessary columns
+                df = df[["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"]]
+
                 # Concatenate the selected columns to the result DataFrame
                 result_df = pd.concat([result_df, df])
 
