@@ -7,7 +7,7 @@ from datetime import datetime
 
 def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     # Initialize an empty DataFrame with the additional columns
-    result_df = pd.DataFrame(columns=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
+    result_df = pd.DataFrame()
 
     # Iterate through each CSV file
     for file in csv_files:
@@ -20,12 +20,12 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
             # Print the column names of the current CSV file
             print(f"Columns in file {file}: {pd.read_csv(file, nrows=0).columns}")
 
-            # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
-            df = pd.read_csv(file, delimiter=',', usecols=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
+            # Read the CSV file into a DataFrame
+            df = pd.read_csv(file)
 
             # Check if the DataFrame has any data before processing
             if not df.empty:
-                # Concatenate the selected columns to the result DataFrame
+                # Concatenate the DataFrame to the result DataFrame
                 result_df = pd.concat([result_df, df])
 
             else:
@@ -72,9 +72,6 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
             print("'PrimaryCategory' column not found in result_df. Skipping update.")
     else:
         print("'Category' column not found in category_tree_df. Skipping update.")
-
-    # Rearrange the columns
-    result_df = result_df[["SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"]]
 
     # Generate the current date to include in the output file name
     current_date = datetime.now().strftime("%Y%m%d")
