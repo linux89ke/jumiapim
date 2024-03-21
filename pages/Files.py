@@ -57,8 +57,11 @@ def main():
         # Save the selected columns to a CSV file
         merged_df.to_csv(output_file, index=False, encoding='utf-8-sig')
 
-        # Offer download link for the merged CSV file
-        st.markdown(f"### [Download merged CSV file]({output_file})")
+        # Offer download button for the merged CSV file
+        if st.button("Download merged CSV file"):
+            with open(output_file, "rb") as file:
+                file_content = file.read()
+            st.download_button(label="Download", data=file_content, file_name=output_file)
 
     if add_file_button:
         st.write("Add file logic goes here")
