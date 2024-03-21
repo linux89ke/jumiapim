@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import os
-import csv
 from datetime import datetime
+import csv
 
 def detect_delimiter(file):
     # Read a sample of the file to detect the delimiter
@@ -18,19 +18,18 @@ def merge_csv_files(uploaded_files):
     dfs = []
     for file in uploaded_files:
         delimiter = detect_delimiter(file)
-        # Specify encoding='utf-8' to handle Chinese characters
-        dfs.append(pd.read_csv(file, delimiter=delimiter, encoding='utf-8'))
+        dfs.append(pd.read_csv(file, delimiter=delimiter))
     merged_df = pd.concat(dfs, ignore_index=True)
-
     # Perform VLOOKUP operation with sellers.xlsx
     sellers_df = pd.read_excel("sellers.xlsx")
     merged_df = pd.merge(merged_df, sellers_df[['SellerName', 'Seller_ID']], on='SellerName', how='left')
     merged_df.rename(columns={'Seller_ID': 'SellerID'}, inplace=True)
-
-    # Perform VLOOKUP operation with category_tree.xlsx
+    # Add Category column from category_tree.xlsx
     category_tree_df = pd.read_excel("category_tree.xlsx")
     merged_df = pd.merge(merged_df, category_tree_df[['PrimaryCategory', 'Category']], on='PrimaryCategory', how='left')
-
+    # Add Global_Date_Time column
+    merged_df['Global_Date_Time'] = datetime.now().strftime("%Y-%m-%d_%H")
+    # Keep SellerSku as it is
     return merged_df
 
 def main():
@@ -44,26 +43,22 @@ def main():
     remove_file_button = st.button("Remove File")
 
     if uploaded_files:
-        # Generate output file name with current date and hour
-        current_datetime = datetime.now().strftime("%Y-%m-%d_%H")
-        output_file = f"Global_{current_datetime}.csv"
-
         # Merge the uploaded CSV files
         merged_df = merge_csv_files(uploaded_files)
 
         # Select only specific columns
-        selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory", "SellerID", "SellerSku", "Category"]
+        selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory", "SellerID", "SellerSku", "Category", "Global_Date_Time"]
         merged_df = merged_df[selected_columns]
 
+        # Generate output file name with current date and hour
+        current_datetime = datetime.now().strftime("%Y-%m-%d_%H")
+        output_file = f"Global_{current_datetime}.csv"
+
         # Save the selected columns to a CSV file
-        # Specify encoding='utf-8' to preserve Chinese characters
         merged_df.to_csv(output_file, index=False, encoding='utf-8-sig')
 
         # Offer download link for the merged CSV file
         st.markdown(f"### [Download merged CSV file]({output_file})")
-
-        # Download button for the merged CSV file
-        st.download_button(label="Download merged CSV file", data=open(output_file, "rb").read(), file_name=os.path.basename(output_file), mime="text/csv")
 
     if add_file_button:
         st.write("Add file logic goes here")
