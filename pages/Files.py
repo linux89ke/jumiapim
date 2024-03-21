@@ -19,8 +19,6 @@ def merge_csv_files(output_file, uploaded_files):
         delimiter = detect_delimiter(file)
         dfs.append(pd.read_csv(file, delimiter=delimiter))
     merged_df = pd.concat(dfs, ignore_index=True)
-    # Add blank columns for SellerID and Category
-    
 
     # Perform VLOOKUP operation with sellers.xlsx
     sellers_df = pd.read_excel("sellers.xlsx")
@@ -55,6 +53,4 @@ def main():
         st.download_button(label="Download merged CSV file", data=open(output_file, "rb").read(), file_name=os.path.basename(output_file), mime="text/csv")
 
 if __name__ == "__main__":
-    main()
-
     main()
