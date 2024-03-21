@@ -36,8 +36,12 @@ def merge_csv_files(uploaded_files):
 def main():
     st.title("CSV File Merger")
 
-    # Allow user to upload CSV files
+    # Allow user to add CSV files
     uploaded_files = st.file_uploader("Upload CSV files to merge", accept_multiple_files=True)
+
+    # Allow user to add or remove files
+    add_file_button = st.button("Add File")
+    remove_file_button = st.button("Remove File")
 
     if uploaded_files:
         # Generate output file name with current date and hour
@@ -60,6 +64,12 @@ def main():
 
         # Download button for the merged CSV file
         st.download_button(label="Download merged CSV file", data=open(output_file, "rb").read(), file_name=os.path.basename(output_file), mime="text/csv")
+
+    if add_file_button:
+        st.write("Add file logic goes here")
+
+    if remove_file_button:
+        st.write("Remove file logic goes here")
 
 if __name__ == "__main__":
     main()
