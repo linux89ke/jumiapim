@@ -1,18 +1,27 @@
 import os
 import pandas as pd
-from datetime import datetime
 import streamlit as st
+import glob
 import base64
+from datetime import datetime
 
 def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     # Initialize an empty DataFrame with the additional columns
     result_df = pd.DataFrame(columns=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
 
-    # Iterate through each uploaded CSV file
+    # Iterate through each CSV file
     for file in csv_files:
         try:
-            # Read the CSV file into a DataFrame
-            df = pd.read_csv(file)
+            # Check if the file is not empty and has a valid CSV file extension
+            if pd.read_csv(file, nrows=1).empty:
+                print(f"Skipping empty CSV file: {file}")
+                continue
+
+            # Print the column names of the current CSV file
+            print(f"Columns in file {file}: {pd.read_csv(file, nrows=0).columns}")
+
+            # Read the CSV file into a DataFrame, specifying the delimiter and extracting necessary columns
+            df = pd.read_csv(file, delimiter=',', usecols=["SellerName", "SellerSku", "PrimaryCategory", "Name", "Brand"])
 
             # Check if the DataFrame has any data before processing
             if not df.empty:
@@ -20,21 +29,21 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
                 result_df = pd.concat([result_df, df])
 
             else:
-                st.warning(f"Empty DataFrame in file: {file.name}. Skipping...")
+                print(f"Empty DataFrame in file: {file}. Skipping...")
 
         except pd.errors.EmptyDataError:
-            st.warning(f"No data to parse in file: {file.name}. Skipping...")
+            print(f"No data to parse in file: {file}. Skipping...")
             continue
         except pd.errors.ParserError as e:
-            st.error(f"Error reading file: {file.name}. Skipping...")
-            st.error(f"Error details: {e}")
+            print(f"Error reading file: {file}. Skipping...")
+            print(f"Error details: {e}")
             continue
 
     # Load the "sellers" Excel file
     try:
         sellers_df = pd.read_excel(sellers_file)
     except pd.errors.EmptyDataError:
-        st.warning(f"No data to parse in file: {sellers_file}. Skipping...")
+        print(f"No data to parse in file: {sellers_file}. Skipping...")
         sellers_df = pd.DataFrame(columns=["SellerName", "Seller_ID"])
 
     # Perform a VLOOKUP to add the "Seller_ID" column based on "SellerName"
@@ -44,7 +53,7 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
     try:
         category_tree_df = pd.read_excel(category_tree_file)
     except pd.errors.EmptyDataError:
-        st.warning(f"No data to parse in file: {category_tree_file}. Skipping...")
+        print(f"No data to parse in file: {category_tree_file}. Skipping...")
         category_tree_df = pd.DataFrame(columns=["PrimaryCategory", "Category"])
 
     # Check if 'Category' column exists in category_tree_df
@@ -60,9 +69,9 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
             # Drop redundant columns
             result_df = result_df.drop(columns=['Category'])
         else:
-            st.warning("'PrimaryCategory' column not found in result_df. Skipping update.")
+            print("'PrimaryCategory' column not found in result_df. Skipping update.")
     else:
-        st.warning("'Category' column not found in category_tree_df. Skipping update.")
+        print("'Category' column not found in category_tree_df. Skipping update.")
 
     # Rearrange the columns
     result_df = result_df[["SellerName", "Name", "Seller_ID", "SellerSku", "PrimaryCategory", "Brand"]]
@@ -81,31 +90,27 @@ def merge_csv_files(output_file, csv_files, sellers_file, category_tree_file):
 
     # Write the merged DataFrame to the new CSV file
     result_df.to_csv(output_file, index=False)
-    st.success(f"Merge completed. Merged data saved to {output_file}")
 
-    # Provide a download link for the merged result
+    # Provide a link to download the output file
     st.markdown(get_binary_file_downloader_html(output_file), unsafe_allow_html=True)
 
-def get_binary_file_downloader_html(bin_file, file_label='Download CSV'):
+def get_binary_file_downloader_html(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
     bin_str = base64.b64encode(data).decode()
-    href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{bin_file}" target="_blank">{file_label}</a>'
+    href = f'<a href="data:file/csv;base64,{bin_str}" download="{os.path.basename(bin_file)}">Download CSV File</a>'
     return href
 
 if __name__ == "__main__":
-    # Specify the output file name
-    output_file = "Merged_skus_date.csv"
+    st.title("CSV File Merger")
 
     # File uploader for CSV files
-    st.title("Merge CSV Files")
-    csv_files = st.file_uploader("Upload CSV files", type="csv", accept
-   if csv_files:
-        # Specify the sellers Excel file name
-        sellers_file = "sellers.xlsx"
+    st.sidebar.title("Upload CSV Files")
+    uploaded_files = st.sidebar.file_uploader("Upload CSV files", accept_multiple_files=True, type="csv")
 
-        # Specify the category tree Excel file name
-        category_tree_file = "category_tree.xlsx"
+    if uploaded_files:
+        # Specify the output file name
+        output_file = "Merged_skus_date.csv"
 
         # Call the function to merge the CSV files, perform VLOOKUP, and update PrimaryCategory
-        merge_csv_files(output_file, csv_files, sellers_file, category_tree_file)
+        merge_csv_files(output_file, uploaded_files, "sellers.xlsx", "category_tree.xlsx")
