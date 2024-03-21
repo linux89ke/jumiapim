@@ -77,10 +77,16 @@ def split_and_save_excel(input_file, chunk_size=9998):
             df_chunks = [df[i:i+chunk_size] for i in range(0, len(df), chunk_size)]
 
             for i, chunk in enumerate(df_chunks):
+                # Merge chunk with product_sets_df on a common column (e.g., if ProductSetSid is the common column)
+                merged_chunk = pd.merge(chunk, product_sets_df, on='ProductSetSid', how='left')
+                
+                # Rename the 'Placeholder' column to 'ProductSetSid' if necessary
+                if 'Placeholder' in merged_chunk.columns:
+                    merged_chunk.rename(columns={'Placeholder': 'ProductSetSid'}, inplace=True)
+
                 output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
                 with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
-                    chunk.to_excel(writer, sheet_name='ProductSets', index=False)
-                    product_sets_df.to_excel(writer, sheet_name='ProductSets', index=False)
+                    merged_chunk.to_excel(writer, sheet_name='ProductSets', index=False)
                     reasons_df.to_excel(writer, sheet_name='RejectionReasons', index=False)
                 output_files.append(output_file_name)
 
