@@ -1,15 +1,32 @@
 import streamlit as st
 import pandas as pd
+import csv
 
 # Function to concatenate uploaded CSV files
 def concatenate_csv_files(files):
+    common_columns = None
     df_list = []
+    
+    # Identify common columns among all files
     for file in files:
         try:
-            df = pd.read_csv(file)
-            df_list.append(df)
+            df = pd.read_csv(file, nrows=1)
+            if common_columns is None:
+                common_columns = set(df.columns)
+            else:
+                common_columns = common_columns.intersection(df.columns)
         except Exception as e:
             st.warning(f"Could not read file {file.name} because of error: {e}")
+
+    if common_columns is not None:
+        # Read files while specifying only common columns
+        for file in files:
+            try:
+                df = pd.read_csv(file, usecols=common_columns, error_bad_lines=False, quoting=csv.QUOTE_NONE)
+                df_list.append(df)
+            except Exception as e:
+                st.warning(f"Could not read file {file.name} because of error: {e}")
+    
     if len(df_list) == 0:
         return None
     else:
