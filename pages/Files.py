@@ -6,8 +6,9 @@ import csv
 def detect_delimiter(file):
     # Read a sample of the file to detect the delimiter
     sample = file.read(1024)
+    sample_str = sample.decode('utf-8')  # Decode bytes to string
     file.seek(0)  # Reset file pointer to beginning
-    dialect = csv.Sniffer().sniff(sample)
+    dialect = csv.Sniffer().sniff(sample_str)
     return dialect.delimiter
 
 def merge_csv_files(output_file, uploaded_files):
