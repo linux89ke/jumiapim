@@ -38,10 +38,12 @@ def split_and_save_excel(input_file, chunk_size=9998):
     # Check if the required sheet "ProductSets" is present
     if "ProductSets" not in excel_file.sheet_names:
         st.warning("Input file doesn't have a 'ProductSets' sheet. Creating an empty sheet.")
-        product_sets_df = pd.DataFrame(columns=["Placeholder"])
+        product_sets_df = pd.DataFrame(columns=["ProductSetSid"])
     else:
         # Read the ProductSets sheet
         product_sets_df = excel_file.parse("ProductSets")
+        # Ensure the first column is named "ProductSetSid"
+        product_sets_df.columns.values[0] = "ProductSetSid"
 
     # Get total number of rows in the input file
     total_rows = 0
@@ -77,21 +79,12 @@ def split_and_save_excel(input_file, chunk_size=9998):
             df_chunks = [df[i:i+chunk_size] for i in range(0, len(df), chunk_size)]
 
             for i, chunk in enumerate(df_chunks):
-                # Check if 'ProductSetSid' column exists in both chunk and product_sets_df
-                if 'ProductSetSid' not in chunk.columns or 'ProductSetSid' not in product_sets_df.columns:
-                    st.error("Required column 'ProductSetSid' not found in input data.")
-                    return [], 0
-
-                # Merge chunk with product_sets_df on a common column (e.g., if ProductSetSid is the common column)
-                merged_chunk = pd.merge(chunk, product_sets_df, on='ProductSetSid', how='left')
-                
-                # Rename the 'Placeholder' column to 'ProductSetSid' if necessary
-                if 'Placeholder' in merged_chunk.columns:
-                    merged_chunk.rename(columns={'Placeholder': 'ProductSetSid'}, inplace=True)
-
                 output_file_name = f"KE_PIM_{current_date}_{sheet_name}_Set{i + 1}.xlsx"
                 with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
-                    merged_chunk.to_excel(writer, sheet_name='ProductSets', index=False)
+                    # Ensure the first column is named "ProductSetSid"
+                    chunk.columns.values[0] = "ProductSetSid"
+                    chunk.to_excel(writer, sheet_name='ProductSets', index=False)
+                    product_sets_df.to_excel(writer, sheet_name='ProductSets', index=False)
                     reasons_df.to_excel(writer, sheet_name='RejectionReasons', index=False)
                 output_files.append(output_file_name)
 
