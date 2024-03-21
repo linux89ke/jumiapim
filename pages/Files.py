@@ -7,7 +7,7 @@ def concatenate_csv_files(files):
     
     for file in files:
         try:
-            df = pd.read_csv(file, encoding='utf-8-sig')
+            df = pd.read_csv(file, error_bad_lines=False, encoding='utf-8-sig')
             df_list.append(df)
         except Exception as e:
             st.warning(f"Could not read file {file.name} because of error: {e}")
