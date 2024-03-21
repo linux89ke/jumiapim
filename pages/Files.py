@@ -6,10 +6,16 @@ def merge_csv_files(files):
     dfs = []
     for file in files:
         try:
+            # Try reading with default configuration
             df = pd.read_csv(file)
             dfs.append(df)
-        except Exception as e:
-            st.error(f"Error reading file {file.name}: {e}")
+        except pd.errors.ParserError:
+            try:
+                # Try reading with different delimiter
+                df = pd.read_csv(file, delimiter=';')
+                dfs.append(df)
+            except Exception as e:
+                st.error(f"Error reading file {file.name}: {e}")
     if dfs:
         merged_df = pd.concat(dfs, axis=1, join='inner')
         return merged_df
