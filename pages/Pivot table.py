@@ -45,7 +45,7 @@ def process_files(input_file):
     reason_mapping = {
         'col': '1000005 - Kindly confirm the actual product colour',
         'cat': '1000004 - Wrong Category',
-        'var': '1000004 - 1000038 - Kindly Ensure ALL Sizes Of This Product Are Created As Variants Under This Product & Not Created As Unique Products',
+        'var': '1000038 - Kindly Ensure ALL Sizes Of This Product Are Created As Variants Under This Product & Not Created As Unique Products',
         'bra': '1000007 - Other Reason',
         
     }
