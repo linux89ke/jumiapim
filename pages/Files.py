@@ -6,6 +6,10 @@ def merge_csv_files(output_file, uploaded_files):
     merged_df = pd.concat([pd.read_csv(file, delimiter=';') for file in uploaded_files], ignore_index=True)
     return merged_df
 
+def add_seller_id(merged_df, sellers_df):
+    merged_df["SellerID"] = merged_df["SellerName"].map(sellers_df.set_index("SellerName")["Seller_ID"])
+    return merged_df
+
 def main():
     st.title("CSV File Merger")
 
@@ -18,8 +22,14 @@ def main():
         # Merge the uploaded CSV files
         merged_df = merge_csv_files(output_file, uploaded_files)
 
+        # Read the sellers.xls file to get the SellerID
+        sellers_df = pd.read_excel("sellers.xls")
+
+        # Add SellerID column using VLOOKUP
+        merged_df = add_seller_id(merged_df, sellers_df)
+
         # Select only specific columns
-        selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory"]
+        selected_columns = ["SellerID", "SellerName", "Name", "Brand", "PrimaryCategory"]
         merged_df = merged_df[selected_columns]
 
         # Save the selected columns to a CSV file
