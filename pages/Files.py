@@ -6,9 +6,9 @@ import csv
 def detect_delimiter(file):
     # Read a sample of the file to detect the delimiter
     sample = file.read(1024)
-    sample_str = sample.decode('utf-8')  # Decode bytes to string
     file.seek(0)  # Reset file pointer to beginning
-    dialect = csv.Sniffer().sniff(sample_str)
+    # Use CSV Sniffer to detect delimiter
+    dialect = csv.Sniffer().sniff(sample)
     return dialect.delimiter
 
 def merge_csv_files(output_file, uploaded_files):
@@ -23,6 +23,11 @@ def merge_csv_files(output_file, uploaded_files):
         st.warning("Uploaded files have different delimiters. Please ensure all files have the same delimiter.")
         return None
     merged_df = pd.concat(merged_dfs, ignore_index=True)
+    
+    # Add blank columns for SellerID and Category
+    merged_df["SellerID"] = ""
+    merged_df["Category"] = ""
+    
     return merged_df
 
 def main():
@@ -39,7 +44,7 @@ def main():
 
         if merged_df is not None:
             # Select only specific columns
-            selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory"]
+            selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory", "SellerID", "Category"]
             merged_df = merged_df[selected_columns]
 
             # Save the selected columns to a CSV file
