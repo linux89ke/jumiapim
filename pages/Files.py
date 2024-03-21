@@ -20,13 +20,11 @@ def merge_csv_files(output_file, uploaded_files):
         dfs.append(pd.read_csv(file, delimiter=delimiter))
     merged_df = pd.concat(dfs, ignore_index=True)
     # Add blank columns for SellerID and Category
-    merged_df['SellerID'] = ''
     merged_df['Category'] = ''
 
     # Perform VLOOKUP operation with sellers.xlsx
     sellers_df = pd.read_excel("sellers.xlsx")
-    merged_df = pd.merge(merged_df, sellers_df[['SellerName', 'Seller_ID']], on='SellerName', how='left')
-    merged_df.rename(columns={'Seller_ID': 'SellerID'}, inplace=True)
+    merged_df['SellerID'] = merged_df['SellerName'].map(sellers_df.set_index('SellerName')['Seller_ID'])
 
     return merged_df
 
