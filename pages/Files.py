@@ -19,7 +19,7 @@ def main():
         merged_df = merge_csv_files(output_file, uploaded_files)
 
         # Select only specific columns
-        selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory",]
+        selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory"]
         merged_df = merged_df[selected_columns]
 
         # Save the selected columns to a CSV file
