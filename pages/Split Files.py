@@ -77,6 +77,11 @@ def split_and_save_excel(input_file, chunk_size=9998):
             df_chunks = [df[i:i+chunk_size] for i in range(0, len(df), chunk_size)]
 
             for i, chunk in enumerate(df_chunks):
+                # Check if 'ProductSetSid' column exists in both chunk and product_sets_df
+                if 'ProductSetSid' not in chunk.columns or 'ProductSetSid' not in product_sets_df.columns:
+                    st.error("Required column 'ProductSetSid' not found in input data.")
+                    return [], 0
+
                 # Merge chunk with product_sets_df on a common column (e.g., if ProductSetSid is the common column)
                 merged_chunk = pd.merge(chunk, product_sets_df, on='ProductSetSid', how='left')
                 
