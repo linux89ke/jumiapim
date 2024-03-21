@@ -26,6 +26,10 @@ def merge_csv_files(output_file, uploaded_files):
     merged_df = pd.merge(merged_df, sellers_df[['SellerName', 'Seller_ID']], on='SellerName', how='left')
     merged_df.rename(columns={'Seller_ID': 'SellerID'}, inplace=True)
 
+    # Perform VLOOKUP operation with category_tree.xlsx
+    category_tree_df = pd.read_excel("category_tree.xlsx")
+    merged_df = pd.merge(merged_df, category_tree_df[['PrimaryCategory', 'Category']], on='PrimaryCategory', how='left')
+
     return merged_df
 
 def main():
@@ -41,7 +45,7 @@ def main():
         merged_df = merge_csv_files(output_file, uploaded_files)
 
         # Select only specific columns
-        selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory", "SellerID", "SellerSku"]
+        selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory", "SellerID", "SellerSku", "Category"]
         merged_df = merged_df[selected_columns]
 
         # Save the selected columns to a CSV file
