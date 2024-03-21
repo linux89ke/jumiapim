@@ -20,7 +20,7 @@ def process_files(input_file):
     
     # Read the file into a DataFrame (handle both Excel and CSV files)
     if input_file.name.endswith('.xlsx') or input_file.name.endswith('.xls'):
-        df = pd.read_excel(input_file)
+        df = pd.read_excel(input_file, engine='xlrd')  # Modified line
     elif input_file.name.endswith('.csv'):
         try:
             df = pd.read_csv(input_file, encoding='utf-8')
