@@ -90,8 +90,7 @@ def process_files(input_file):
     
     # Add two columns after 'rej' with 'KE' and 'Charles'
     final_df.insert(final_df.columns.get_loc('rej') + 1, 'new_col_1', 'KE')
-    final_df.insert(final_df.columns.get_loc('rej')
-.get_loc('rej') + 2, 'new_col_2', 'Charles')
+    final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', 'Charles')
     
     # Add a blank column after 'rej'
     final_df.insert(final_df.columns.get_loc('rej') + 3, 'Blank_Column', '')
