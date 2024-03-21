@@ -128,7 +128,7 @@ def process_files(input_file):
     
     # Save the PIM DataFrame to an Excel file
     pim_output_path = os.path.join(output_folder, pim_output_file)
-    pim_df.to_excel(pim_output_path, index=False, encoding='utf-8-sig')
+pim_df.to_excel(pim_output_path, index=False)  # Save as Excel file without index
     
     # Display success message with downloadable link for PIM file
     st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
