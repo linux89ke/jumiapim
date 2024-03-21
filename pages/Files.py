@@ -1,13 +1,28 @@
 import streamlit as st
 import pandas as pd
 import os
+import csv
 
-def merge_csv_files(output_file, uploaded_files, delimiter=','):
-    try:
-        merged_df = pd.concat([pd.read_csv(file, delimiter=delimiter) for file in uploaded_files], ignore_index=True)
-        return merged_df
-    except pd.errors.ParserError:
-        st.warning("One or more uploaded files are invalid CSV files and will be ignored.")
+def detect_delimiter(file):
+    # Read a sample of the file to detect the delimiter
+    sample = file.read(1024)
+    file.seek(0)  # Reset file pointer to beginning
+    dialect = csv.Sniffer().sniff(sample)
+    return dialect.delimiter
+
+def merge_csv_files(output_file, uploaded_files):
+    delimiters = set()
+    merged_dfs = []
+    for file in uploaded_files:
+        delimiter = detect_delimiter(file)
+        delimiters.add(delimiter)
+        merged_df = pd.read_csv(file, delimiter=delimiter)
+        merged_dfs.append(merged_df)
+    if len(delimiters) > 1:
+        st.warning("Uploaded files have different delimiters. Please ensure all files have the same delimiter.")
+        return None
+    merged_df = pd.concat(merged_dfs, ignore_index=True)
+    return merged_df
 
 def main():
     st.title("CSV File Merger")
@@ -18,11 +33,8 @@ def main():
     if uploaded_files:
         output_file = "merged_file.csv"
 
-        # Delimiter selection
-        delimiter = st.selectbox("Select delimiter:", [',', ';'])
-
         # Merge the uploaded CSV files
-        merged_df = merge_csv_files(output_file, uploaded_files, delimiter)
+        merged_df = merge_csv_files(output_file, uploaded_files)
 
         if merged_df is not None:
             # Select only specific columns
