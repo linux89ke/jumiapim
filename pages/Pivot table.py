@@ -43,11 +43,11 @@ def process_files(input_file):
     
     # Map values under 'reason' to the desired replacements
     reason_mapping = {
-        'col': 'Wrong Color',
-        'cat': 'Wrong Category',
-        'var': 'Wrong Variation - Size Only',
+        'col': '1000005 - Kindly confirm the actual product colour',
+        'cat': '1000004 - Wrong Category',
+        'var': '1000004 - 1000038 - Kindly Ensure ALL Sizes Of This Product Are Created As Variants Under This Product & Not Created As Unique Products',
         'bra': 'Wrong Brand',
-        'Wrong Variation - means size only': 'Wrong Variation - means size only'
+        
     }
     
     # Create a pivot table without totals
