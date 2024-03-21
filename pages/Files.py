@@ -94,18 +94,26 @@ def merge_csv_files(output_file, sellers_file, category_tree_file):
     # Write the merged DataFrame to the new CSV file
     result_df.to_csv(output_file, index=False)
 
+    return output_file
+
+
 # Streamlit app
 def main():
     st.title("CSV File Merger")
 
-    # Upload files
-    sellers_file = st.file_uploader("Upload sellers Excel file", type=["xlsx"])
-    category_tree_file = st.file_uploader("Upload category tree Excel file", type=["xlsx"])
+    # Upload CSV files
+    sellers_file = st.file_uploader("Upload Sellers Excel file", type=["xlsx"])
+    category_tree_file = st.file_uploader("Upload Category Tree Excel file", type=["xlsx"])
 
-    if sellers_file and category_tree_file:
-        # Merge CSV files
-        merge_csv_files("Merged_skus.csv", sellers_file, category_tree_file)
-        st.success("CSV files merged successfully!")
+    if sellers_file is not None and category_tree_file is not None:
+        output_file = "Merged_skus_date.csv"
+
+        # Call the function to merge the CSV files, perform VLOOKUP, and update PrimaryCategory
+        result_file = merge_csv_files(output_file, sellers_file, category_tree_file)
+
+        st.success("Files successfully merged!")
+        st.write("Download the merged CSV file:")
+        st.download_button(label="Download Merged CSV", data=result_file, file_name=result_file, mime="text/csv")
 
 if __name__ == "__main__":
     main()
