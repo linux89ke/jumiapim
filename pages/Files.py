@@ -4,7 +4,6 @@ import os
 
 def merge_csv_files(output_file, uploaded_files):
     merged_df = pd.concat([pd.read_csv(file, delimiter=';') for file in uploaded_files], ignore_index=True)
-    merged_df.to_csv(output_file, index=False)  # Save the merged DataFrame to a CSV file
     return merged_df
 
 def main():
@@ -19,9 +18,12 @@ def main():
         # Merge the uploaded CSV files
         merged_df = merge_csv_files(output_file, uploaded_files)
 
-        # Display merged DataFrame
-        st.write("Merged DataFrame:")
-        st.write(merged_df)
+        # Select only specific columns
+        selected_columns = ["Jumia SKU", "SellerName", "Name", "Brand", "Model", "Color", "PrimaryCategory", "SalePrice"]
+        merged_df = merged_df[selected_columns]
+
+        # Save the selected columns to a CSV file
+        merged_df.to_csv(output_file, index=False)
 
         # Offer download link for the merged CSV file
         st.markdown(f"### [Download merged CSV file]({output_file})")
