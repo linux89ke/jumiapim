@@ -17,7 +17,8 @@ def merge_csv_files(output_file, uploaded_files):
     dfs = []
     for file in uploaded_files:
         delimiter = detect_delimiter(file)
-        dfs.append(pd.read_csv(file, delimiter=delimiter))
+        # Specify encoding='utf-8' to handle Chinese characters
+        dfs.append(pd.read_csv(file, delimiter=delimiter, encoding='utf-8'))
     merged_df = pd.concat(dfs, ignore_index=True)
 
     # Perform VLOOKUP operation with sellers.xlsx
@@ -44,7 +45,8 @@ def main():
         merged_df = merged_df[selected_columns]
 
         # Save the selected columns to a CSV file
-        merged_df.to_csv(output_file, index=False)
+        # Specify encoding='utf-8' to preserve Chinese characters
+        merged_df.to_csv(output_file, index=False, encoding='utf-8-sig')
 
         # Offer download link for the merged CSV file
         st.markdown(f"### [Download merged CSV file]({output_file})")
