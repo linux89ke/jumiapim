@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import csv
+from datetime import datetime
 
 def detect_delimiter(file):
     # Read a sample of the file to detect the delimiter
@@ -13,7 +14,7 @@ def detect_delimiter(file):
     dialect = csv.Sniffer().sniff(sample_str)
     return dialect.delimiter
 
-def merge_csv_files(output_file, uploaded_files):
+def merge_csv_files(uploaded_files):
     dfs = []
     for file in uploaded_files:
         delimiter = detect_delimiter(file)
@@ -39,10 +40,12 @@ def main():
     uploaded_files = st.file_uploader("Upload CSV files to merge", accept_multiple_files=True)
 
     if uploaded_files:
-        output_file = "merged_file.csv"
+        # Generate output file name with current date and hour
+        current_datetime = datetime.now().strftime("%Y-%m-%d_%H")
+        output_file = f"Global_{current_datetime}.csv"
 
         # Merge the uploaded CSV files
-        merged_df = merge_csv_files(output_file, uploaded_files)
+        merged_df = merge_csv_files(uploaded_files)
 
         # Select only specific columns
         selected_columns = ["SellerName", "Name", "Brand", "PrimaryCategory", "SellerID", "SellerSku", "Category"]
