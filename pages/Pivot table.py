@@ -120,16 +120,14 @@ def process_files(input_file):
     # Create the PIM DataFrame
     pim_df = df[['PRODUCT_SET_SID', 'PARENTSKU']].copy()  # Use the correct column names from the input file
     pim_df.columns = ['ProductSetSid', 'ParentSKU']  # Rename columns for consistency
-    
+
     # Apply mapping for 'reason' to generate 'Status' and 'Reason' columns
     pim_df['Status'] = df['reason'].apply(lambda x: 'Approved' if pd.isna(x) or x == '' else 'Rejected')
     pim_df['Reason'] = df['reason'].map(reason_mapping).fillna('Approved')  # Fill blank reasons with 'Approved'
-    pim_df['Timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Add timestamp column
-    
+
     # Save the PIM DataFrame to an Excel file
     pim_output_path = os.path.join(output_folder, pim_output_file)
     pim_df.to_excel(pim_output_path, index=False) 
-    # Save as Excel file without index
 
 
     # Display success message with downloadable link for PIM file
