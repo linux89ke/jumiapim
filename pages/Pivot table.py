@@ -47,7 +47,6 @@ def process_files(input_file):
         'cat': '1000004 - Wrong Category',
         'var': '1000004 - 1000038 - Kindly Ensure ALL Sizes Of This Product Are Created As Variants Under This Product & Not Created As Unique Products',
         'bra': 'Wrong Brand',
-        
     }
     
     # Create a pivot table without totals
@@ -91,7 +90,8 @@ def process_files(input_file):
     
     # Add two columns after 'rej' with 'KE' and 'Charles'
     final_df.insert(final_df.columns.get_loc('rej') + 1, 'new_col_1', 'KE')
-    final_df.insert(final_df.columns.get_loc('rej') + 2, 'new_col_2', 'Charles')
+    final_df.insert(final_df.columns.get_loc('rej')
+.get_loc('rej') + 2, 'new_col_2', 'Charles')
     
     # Add a blank column after 'rej'
     final_df.insert(final_df.columns.get_loc('rej') + 3, 'Blank_Column', '')
@@ -128,7 +128,6 @@ def process_files(input_file):
     # Save the PIM DataFrame to an Excel file
     pim_output_path = os.path.join(output_folder, pim_output_file)
     pim_df.to_excel(pim_output_path, index=False) 
-
 
     # Display success message with downloadable link for PIM file
     st.markdown(get_download_link(pim_output_path, "Download PIM File"), unsafe_allow_html=True)
